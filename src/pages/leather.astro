@@ -1,0 +1,424 @@
+---
+import '@fontsource/gloock';
+import '@fontsource-variable/karla';
+import DemoBadge from '../components/DemoBadge.astro';
+
+const brand = { name: 'Saddle Row Leather', town: 'Guagua, Pampanga', phone: '0917 000 0000', messenger: 'https://m.me/yourpage' };
+
+const items = [
+  { id: 'iwb', label: 'Inside-waistband holster', price: 3200, holster: true },
+  { id: 'owb', label: 'Outside-waistband holster', price: 3600, holster: true },
+  { id: 'belt', label: 'Gun belt', price: 2800, holster: false },
+  { id: 'mag', label: 'Double magazine carrier', price: 1900, holster: false },
+];
+const leathers = [
+  { id: 'natural', label: 'Natural', hex: '#D9AE7E', add: 0 },
+  { id: 'cognac', label: 'Cognac', hex: '#9A5426', add: 0 },
+  { id: 'chestnut', label: 'Chestnut', hex: '#6B3A22', add: 0 },
+  { id: 'black', label: 'Black', hex: '#232120', add: 200 },
+  { id: 'oxblood', label: 'Oxblood', hex: '#5E1A1D', add: 400 },
+];
+const threads = [
+  { id: 'cream', label: 'Cream', hex: '#EDE3CF' },
+  { id: 'black', label: 'Black', hex: '#151515' },
+  { id: 'brown', label: 'Brown', hex: '#4A2E1A' },
+  { id: 'red', label: 'Red', hex: '#B3261E' },
+];
+const fits = ['Glock 19 / 23 / 45', 'Glock 43X / 48', 'Sig Sauer P365', '1911, 5 inch', 'Taurus G3c', 'Canik TP9 series', 'Something else (we trace your firearm)'];
+const steps = [
+  { title: 'Pattern', text: 'We trace your firearm or belt size and cut the pattern from full-grain vegetable-tanned leather.' },
+  { title: 'Wet-mold', text: 'Holsters are molded wet around a model of your gun, so the fit holds without straps.' },
+  { title: 'Hand-stitch', text: 'Every seam is saddle-stitched by hand with waxed thread. It outlasts machine stitching.' },
+  { title: 'Finish', text: 'Edges are sanded, dyed and burnished, then the piece is sealed and checked for draw.' },
+];
+const work = [
+  { cap: 'Chestnut IWB for a Glock 19, cream thread', tall: true },
+  { cap: 'Black dress gun belt, 1.5 inch' },
+  { cap: 'Oxblood OWB for a 1911' },
+  { cap: 'Natural double mag carrier with initials' },
+  { cap: 'Cognac IWB, left hand' },
+];
+---
+<!doctype html>
+<html lang="en" data-default-brand={brand.name}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{brand.name} | Handmade holsters and gun belts</title>
+    <meta name="description" content={`Holsters, gun belts and magazine carriers made by hand in ${brand.town}. Design yours and see the price right away.`} />
+    <meta name="theme-color" content="#1E3A31" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="logo" href="#top"><span class="stamp" aria-hidden="true" data-brand-initials>SR</span><span data-brand>{brand.name}</span></a>
+      <nav aria-label="Main">
+        <a href="#build">Design yours</a>
+        <a href="#work">Our work</a>
+        <a href="#made">How it's made</a>
+        <a href="#care">Care</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" id="build">
+        <div class="hero-head">
+          <h1>Made to fit your gun, your belt and your hand</h1>
+          <p>Every piece is cut, molded and stitched by hand in {brand.town}. Choose what you want below and you'll see it and its price before you order.</p>
+        </div>
+
+        <div class="builder">
+          <div class="mat" aria-live="polite">
+            <svg id="preview" viewBox="0 0 320 320" role="img" aria-labelledby="preview-title">
+              <title id="preview-title">Preview of your build</title>
+              <defs>
+                <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#fff" stop-opacity="0.22" />
+                  <stop offset="0.45" stop-color="#fff" stop-opacity="0" />
+                  <stop offset="1" stop-color="#000" stop-opacity="0.22" />
+                </linearGradient>
+              </defs>
+              <g id="flip">
+                <g data-shape="iwb">
+                  <path class="hide" d="M110 40H220Q232 40 232 52V150Q232 168 220 180L196 268Q192 284 176 284H150Q136 284 134 270L120 190Q96 170 96 140V54Q96 40 110 40Z" />
+                  <path class="sheen" d="M110 40H220Q232 40 232 52V150Q232 168 220 180L196 268Q192 284 176 284H150Q136 284 134 270L120 190Q96 170 96 140V54Q96 40 110 40Z" />
+                  <path class="stitch" d="M114 52H216Q220 52 220 56V148Q220 162 210 172L186 262Q184 272 174 272H152Q146 272 145 264L132 186Q108 168 108 140V58Q108 52 114 52Z" />
+                  <path class="mold" d="M122 74H206M150 96Q164 120 150 146" />
+                  <rect class="clip" x="210" y="22" width="26" height="74" rx="6" />
+                  <text class="initials" x="166" y="236" text-anchor="middle"></text>
+                </g>
+                <g data-shape="owb" style="display:none">
+                  <path class="hide" d="M70 60Q70 40 90 40H230Q250 40 250 60V170Q250 190 236 200L196 276Q190 288 176 288H144Q130 288 124 276L84 200Q70 190 70 170Z" />
+                  <path class="sheen" d="M70 60Q70 40 90 40H230Q250 40 250 60V170Q250 190 236 200L196 276Q190 288 176 288H144Q130 288 124 276L84 200Q70 190 70 170Z" />
+                  <path class="stitch" d="M84 62Q84 52 94 52H226Q238 52 238 62V168Q238 182 228 190L186 268Q182 276 174 276H146Q138 276 134 268L94 190Q84 182 84 168Z" />
+                  <rect class="slot" x="96" y="70" width="14" height="50" rx="7" />
+                  <rect class="slot" x="210" y="70" width="14" height="50" rx="7" />
+                  <path class="mold" d="M126 92H196M152 116Q166 142 152 170" />
+                  <text class="initials" x="160" y="244" text-anchor="middle"></text>
+                </g>
+                <g data-shape="belt" style="display:none">
+                  <rect class="hide" x="20" y="132" width="284" height="56" rx="6" />
+                  <rect class="sheen" x="20" y="132" width="284" height="56" rx="6" />
+                  <rect class="stitch" x="27" y="139" width="270" height="42" rx="3" />
+                  <rect class="keeper" x="104" y="126" width="20" height="68" rx="3" />
+                  <rect class="buckle" x="30" y="118" width="58" height="84" rx="10" />
+                  <path class="prong" d="M30 160H72" />
+                  <circle class="hole" cx="218" cy="160" r="4.5" />
+                  <circle class="hole" cx="240" cy="160" r="4.5" />
+                  <circle class="hole" cx="262" cy="160" r="4.5" />
+                  <circle class="hole" cx="284" cy="160" r="4.5" />
+                  <text class="initials" x="166" y="168" text-anchor="middle"></text>
+                </g>
+                <g data-shape="mag" style="display:none">
+                  <rect class="hide back" x="66" y="98" width="188" height="202" rx="14" />
+                  <rect class="stitch" x="76" y="108" width="168" height="182" rx="8" />
+                  <path class="hide" d="M84 82Q84 68 98 68H148Q158 68 158 82V252Q158 264 146 264H96Q84 264 84 252Z" />
+                  <path class="sheen" d="M84 82Q84 68 98 68H148Q158 68 158 82V252Q158 264 146 264H96Q84 264 84 252Z" />
+                  <path class="stitch" d="M94 84Q94 78 100 78H142Q148 78 148 84V248Q148 254 142 254H100Q94 254 94 248Z" />
+                  <path class="hide" d="M162 82Q162 68 176 68H226Q236 68 236 82V252Q236 264 224 264H174Q162 264 162 252Z" />
+                  <path class="sheen" d="M162 82Q162 68 176 68H226Q236 68 236 82V252Q236 264 224 264H174Q162 264 162 252Z" />
+                  <path class="stitch" d="M172 84Q172 78 178 78H220Q226 78 226 84V248Q226 254 220 254H178Q172 254 172 248Z" />
+                  <text class="initials" x="160" y="285" text-anchor="middle"></text>
+                </g>
+              </g>
+            </svg>
+            <p class="mat-note">Preview only. Your piece is molded to your exact firearm.</p>
+          </div>
+
+          <form class="options" id="options">
+            <fieldset>
+              <legend>What are we making?</legend>
+              <div class="item-grid">
+                {items.map((it, i) => (
+                  <label class="item-opt"><input type="radio" name="item" value={it.id} checked={i === 0} data-price={it.price} data-holster={String(it.holster)} /><span>{it.label}<small>from ₱{it.price.toLocaleString('en-PH')}</small></span></label>
+                ))}
+              </div>
+            </fieldset>
+
+            <label class="field" id="fit-field">Made to fit
+              <select name="fit">{fits.map((f) => <option>{f}</option>)}</select>
+            </label>
+            <label class="field" id="size-field" hidden>Waist size (inches)
+              <input name="size" type="number" min="26" max="50" value="34" inputmode="numeric" />
+            </label>
+
+            <fieldset>
+              <legend>Leather <span class="picked" id="leather-name">Natural</span></legend>
+              <div class="swatches">
+                {leathers.map((l, i) => (
+                  <label class="swatch" title={l.label}><input type="radio" name="leather" value={l.id} checked={i === 0} data-hex={l.hex} data-add={l.add} data-label={l.label} /><span style={`--c:${l.hex}`}></span><span class="sr">{l.label}{l.add ? `, add ₱${l.add}` : ''}</span></label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Thread <span class="picked" id="thread-name">Cream</span></legend>
+              <div class="swatches">
+                {threads.map((t, i) => (
+                  <label class="swatch thread" title={t.label}><input type="radio" name="thread" value={t.id} checked={i === 0} data-hex={t.hex} data-label={t.label} /><span style={`--c:${t.hex}`}></span><span class="sr">{t.label}</span></label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset id="hand-field">
+              <legend>Carry hand</legend>
+              <div class="seg">
+                <label><input type="radio" name="hand" value="Right" checked /><span>Right</span></label>
+                <label><input type="radio" name="hand" value="Left" /><span>Left</span></label>
+              </div>
+            </fieldset>
+
+            <label class="field">Initials, stamped (optional, ₱250)
+              <input name="initials" maxlength="3" placeholder="e.g. JDC" autocomplete="off" />
+            </label>
+
+            <label class="check" id="lining-field"><input type="checkbox" name="lining" /> Suede lining for comfort, ₱500</label>
+
+            <div class="quote">
+              <div><span class="q-label">Your price</span><strong id="price">₱3,200</strong></div>
+              <div><span class="q-label">Ready in</span><strong>10 to 14 days</strong></div>
+            </div>
+            <button type="submit" class="btn">Request this build</button>
+            <div class="sent" id="sent" hidden>
+              <p id="sent-text"></p>
+              <a class="btn btn-small" href={brand.messenger}>Send it on Messenger</a>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="work" class="work">
+        <h2>Recent builds</h2>
+        <p class="lede">Every photo is a real customer piece. Yours will be in this gallery too, if you want it there.</p>
+        <ul class="gallery">
+          {work.map((w) => (
+            <li class:list={[{ tall: w.tall }]}>
+              <div class="ph" role="img" aria-label="Customer build photo placeholder"></div>
+              <p>{w.cap}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section id="made" class="made">
+        <h2>How your piece is made</h2>
+        <ol class="steps">
+          {steps.map((s) => <li><h3>{s.title}</h3><p>{s.text}</p></li>)}
+        </ol>
+      </section>
+
+      <section id="care" class="care">
+        <h2>Care and questions</h2>
+        <div class="faq">
+          <details open><summary>How do I break in a new holster?</summary><p>Put your unloaded firearm in a plastic bag, holster it, and leave it overnight. Do this two or three times. Never force the draw.</p></details>
+          <details><summary>How do I clean it?</summary><p>Wipe with a damp cloth and let it dry away from the sun. Condition it every six months with a light leather balm.</p></details>
+          <details><summary>What if it doesn't fit?</summary><p>Bring it back within 30 days and we re-mold it or remake it at no charge.</p></details>
+          <details><summary>Do you ship?</summary><p>Yes, anywhere in the Philippines by courier. Pickup at the shop is free.</p></details>
+          <details><summary>How do I pay?</summary><p>50% deposit by GCash or bank transfer to start, and the balance before release.</p></details>
+        </div>
+      </section>
+
+      <section id="contact" class="contact">
+        <h2>Visit the workshop</h2>
+        <p>Your street address, {brand.town}<br />Tuesday to Saturday, 10 AM to 6 PM</p>
+        <p><a href={`tel:${brand.phone.replace(/\s/g, '')}`}>{brand.phone}</a> or <a href={brand.messenger}>message us on Facebook</a></p>
+      </section>
+    </main>
+
+    <footer class="foot"><p>&copy; <span data-brand>{brand.name}</span>. Handmade in {brand.town}.</p></footer>
+    <DemoBadge />
+
+    <script>
+      const form = document.getElementById('options') as HTMLFormElement;
+      const svg = document.getElementById('preview')!;
+      const flip = document.getElementById('flip')!;
+      const peso = (n: number) => '₱' + n.toLocaleString('en-PH');
+      const $ = (id: string) => document.getElementById(id)!;
+
+      function update() {
+        const d = new FormData(form);
+        const item = form.querySelector<HTMLInputElement>('input[name=item]:checked')!;
+        const leather = form.querySelector<HTMLInputElement>('input[name=leather]:checked')!;
+        const thread = form.querySelector<HTMLInputElement>('input[name=thread]:checked')!;
+        const holster = item.dataset.holster === 'true';
+        const initials = String(d.get('initials') || '').toUpperCase().replace(/[^A-Z]/g, '');
+
+        svg.querySelectorAll<SVGGElement>('[data-shape]').forEach((g) => (g.style.display = g.dataset.shape === item.value ? '' : 'none'));
+        svg.style.setProperty('--leather', leather.dataset.hex!);
+        svg.style.setProperty('--thread', thread.dataset.hex!);
+        flip.setAttribute('transform', holster && d.get('hand') === 'Left' ? 'translate(320 0) scale(-1 1)' : '');
+        svg.querySelectorAll('.initials').forEach((t) => {
+          t.textContent = initials;
+          t.setAttribute('transform', holster && d.get('hand') === 'Left' ? `translate(${2 * Number(t.getAttribute('x'))} 0) scale(-1 1)` : '');
+        });
+
+        $('fit-field').hidden = !holster;
+        $('hand-field').hidden = !holster;
+        $('lining-field').hidden = !holster;
+        $('size-field').hidden = item.value !== 'belt';
+        $('leather-name').textContent = leather.dataset.label!;
+        $('thread-name').textContent = thread.dataset.label!;
+
+        let price = Number(item.dataset.price) + Number(leather.dataset.add);
+        if (initials) price += 250;
+        if (holster && d.get('lining')) price += 500;
+        $('price').textContent = peso(price);
+        $('sent').hidden = true;
+        return { item, leather, thread, holster, initials, price, d };
+      }
+
+      form.addEventListener('input', update);
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const { item, leather, thread, holster, initials, price, d } = update();
+        const label = item.closest('label')!.querySelector('span')!.firstChild!.textContent;
+        const parts = [label, holster ? `for ${d.get('fit')}, ${String(d.get('hand')).toLowerCase()} hand` : '', item.value === 'belt' ? `size ${d.get('size')}` : '', `${leather.dataset.label!.toLowerCase()} leather`, `${thread.dataset.label!.toLowerCase()} thread`, initials ? `initials ${initials}` : '', holster && d.get('lining') ? 'suede lining' : ''].filter(Boolean);
+        $('sent-text').textContent = `Your build: ${parts.join(', ')}. Estimated ${peso(price)}. Send this on Messenger and we'll confirm the details and deposit.`;
+        $('sent').hidden = false;
+      });
+      update();
+    </script>
+
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      :root {
+        --green: #1e3a31;
+        --green-2: #284a3e;
+        --tan: #d8b48c;
+        --tan-2: #e4c8a6;
+        --cognac: #9a5426;
+        --thread-c: #efe6d6;
+        --brass: #b8933f;
+        --ink: #2a1d14;
+        --display: 'Gloock', Georgia, serif;
+        --text: 'Karla Variable', system-ui, sans-serif;
+      }
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      body { margin: 0; background: var(--tan); color: var(--ink); font: 400 1.0625rem/1.6 var(--text); }
+      h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; line-height: 1.08; }
+      a { color: inherit; }
+      :focus-visible { outline: 2px dashed var(--brass); outline-offset: 3px; }
+      .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    </style>
+
+    <style>
+      .top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem clamp(1rem, 4vw, 3rem); background: var(--green); color: var(--thread-c); border-bottom: 2px dashed rgba(239, 230, 214, 0.35); }
+      .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; font: 400 1.3rem/1 var(--display); }
+      .stamp { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--brass); color: var(--brass); font: 700 0.85rem/1 var(--text); letter-spacing: 0.04em; box-shadow: inset 0 0 0 3px var(--green), inset 0 0 0 4px rgba(184, 147, 63, 0.6); }
+      nav { display: flex; gap: 1.4rem; }
+      nav a { text-decoration: none; opacity: 0.85; }
+      nav a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+
+      section { padding: clamp(3rem, 7vw, 5.5rem) clamp(1rem, 4vw, 3rem); }
+      h2 { font-size: clamp(2.1rem, 4.5vw, 3.2rem); }
+      .lede { max-width: 56ch; margin: 0.75rem 0 2rem; }
+
+      .hero { background: var(--green); color: var(--thread-c); }
+      .hero-head { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: end; max-width: 80rem; margin: 0 auto 2.5rem; }
+      .hero h1 { font-size: clamp(2.5rem, 6vw, 4.6rem); max-width: 14ch; }
+      .hero-head p { margin: 0; max-width: 46ch; opacity: 0.88; font-size: 1.1rem; }
+
+      .builder { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 0; max-width: 80rem; margin: 0 auto; background: var(--thread-c); color: var(--ink); border-radius: 6px; overflow: hidden; }
+      .mat {
+        position: relative; display: grid; place-items: center; padding: 2rem 2rem 3rem;
+        background:
+          linear-gradient(rgba(255,255,255,.09) 1px, transparent 1px) 0 0 / 24px 24px,
+          linear-gradient(90deg, rgba(255,255,255,.09) 1px, transparent 1px) 0 0 / 24px 24px,
+          linear-gradient(rgba(255,255,255,.18) 1px, transparent 1px) 0 0 / 120px 120px,
+          linear-gradient(90deg, rgba(255,255,255,.18) 1px, transparent 1px) 0 0 / 120px 120px,
+          #2f6b4f;
+      }
+      .mat svg { width: min(100%, 540px); height: auto; filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.35)); --leather: #d9ae7e; --thread: #ede3cf; }
+      .mat-note { position: absolute; bottom: 0.75rem; left: 0; right: 0; margin: 0; text-align: center; font-size: 0.85rem; color: rgba(255, 255, 255, 0.75); }
+      .mat :global(.hide) { fill: var(--leather); transition: fill 0.25s; }
+      .mat :global(.back) { filter: brightness(0.85); }
+      .mat :global(.sheen) { fill: url(#sheen); pointer-events: none; }
+      .mat :global(.stitch) { fill: none; stroke: var(--thread); stroke-width: 2.2; stroke-dasharray: 6 4; stroke-linecap: round; transition: stroke 0.25s; }
+      .mat :global(.mold) { fill: none; stroke: #000; stroke-opacity: 0.18; stroke-width: 3; stroke-linecap: round; }
+      .mat :global(.clip) { fill: #2a2b2d; }
+      .mat :global(.slot) { fill: #2f6b4f; }
+      .mat :global(.keeper) { fill: var(--leather); filter: brightness(0.82); }
+      .mat :global(.buckle) { fill: none; stroke: #c8a95a; stroke-width: 8; }
+      .mat :global(.prong) { stroke: #c8a95a; stroke-width: 6; stroke-linecap: round; }
+      .mat :global(.hole) { fill: #1c1a18; }
+      .mat :global(.initials) { font: 700 22px/1 Georgia, serif; letter-spacing: 3px; fill: #000; fill-opacity: 0.28; paint-order: stroke; stroke: #fff; stroke-opacity: 0.18; stroke-width: 1px; }
+      @media (prefers-reduced-motion: reduce) { .mat :global(.hide), .mat :global(.stitch) { transition: none; } }
+
+      .options { padding: clamp(1.5rem, 3vw, 2.25rem); display: grid; gap: 1.2rem; align-content: start; }
+      fieldset { border: 0; margin: 0; padding: 0; }
+      fieldset[hidden], .field[hidden], .check[hidden] { display: none; }
+      legend { font: 400 1.25rem/1.2 var(--display); margin-bottom: 0.6rem; display: flex; gap: 0.6rem; align-items: baseline; }
+      .picked { font: 500 0.95rem var(--text); color: #6c5643; }
+      .item-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+      .item-opt input { position: absolute; opacity: 0; }
+      .item-opt span { display: grid; gap: 0.15rem; height: 100%; padding: 0.7rem 0.8rem; border: 1.5px solid #cbbba4; border-radius: 4px; cursor: pointer; font-weight: 600; line-height: 1.25; background: #fff; }
+      .item-opt small { font-weight: 400; color: #6c5643; }
+      .item-opt input:checked + span { border-color: var(--green); box-shadow: inset 0 0 0 1px var(--green); background: #f3efe4; }
+      .item-opt input:focus-visible + span { outline: 2px dashed var(--brass); outline-offset: 2px; }
+      .field { display: grid; gap: 0.3rem; font-weight: 600; }
+      .field select, .field input { width: 100%; min-width: 0; font: inherit; font-weight: 400; padding: 0.6rem 0.75rem; border: 1.5px solid #cbbba4; border-radius: 4px; background: #fff; }
+      .swatches { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+      .swatch input { position: absolute; opacity: 0; }
+      .swatch > span:not(.sr) { display: block; width: 44px; height: 44px; border-radius: 50%; background: var(--c); cursor: pointer; box-shadow: inset 0 -6px 10px rgba(0,0,0,.25), 0 0 0 1px rgba(0,0,0,.15); }
+      .swatch.thread > span:not(.sr) { width: 36px; height: 36px; background: repeating-linear-gradient(-45deg, var(--c) 0 3px, color-mix(in srgb, var(--c) 80%, #000) 3px 5px); }
+      .swatch input:checked + span { box-shadow: 0 0 0 3px var(--thread-c), 0 0 0 5px var(--green); }
+      .swatch input:focus-visible + span { outline: 2px dashed var(--brass); outline-offset: 6px; }
+      .seg { display: inline-flex; border: 1.5px solid #cbbba4; border-radius: 4px; overflow: hidden; }
+      .seg input { position: absolute; opacity: 0; }
+      .seg span { display: block; padding: 0.5rem 1.2rem; cursor: pointer; background: #fff; font-weight: 600; }
+      .seg input:checked + span { background: var(--green); color: var(--thread-c); }
+      .seg input:focus-visible + span { outline: 2px dashed var(--brass); outline-offset: -4px; }
+      .check { display: flex; gap: 0.5rem; align-items: center; font-weight: 500; }
+      .check input { accent-color: var(--green); width: 1.1rem; height: 1.1rem; }
+      .quote { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem 0; border-top: 2px dashed #cbbba4; }
+      .q-label { display: block; font-size: 0.9rem; color: #6c5643; }
+      .quote strong { font: 400 1.9rem/1.1 var(--display); }
+      .quote div:last-child strong { font-size: 1.2rem; }
+      .btn { display: inline-block; text-align: center; padding: 0.95rem 1.4rem; background: var(--cognac); color: #fff; border: 0; border-radius: 4px; font: 700 1.05rem/1 var(--text); cursor: pointer; text-decoration: none; }
+      .btn:hover { background: #82451d; }
+      .btn-small { padding: 0.7rem 1rem; font-size: 0.95rem; }
+      .sent { padding: 1rem; background: #fff; border-left: 4px solid var(--green); }
+      .sent p { margin: 0 0 0.75rem; }
+
+      .work { max-width: 80rem; margin: 0 auto; }
+      .gallery { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 15rem; gap: 1rem; }
+      .gallery li { display: flex; flex-direction: column; }
+      .gallery li.tall { grid-row: span 2; }
+      .ph { flex: 1; border-radius: 4px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.15), transparent 60%), linear-gradient(135deg, #7a4a2b, #4b2c19); outline: 2px dashed rgba(239, 230, 214, 0.45); outline-offset: -10px; }
+      .gallery p { margin: 0.5rem 0 0; font-size: 0.95rem; }
+
+      .made { background: var(--green); color: var(--thread-c); }
+      .made h2 { max-width: 80rem; margin: 0 auto 2rem; }
+      .steps { list-style: none; margin: 0 auto; padding: 0; max-width: 80rem; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; counter-reset: s; }
+      .steps li { counter-increment: s; border-top: 2px dashed rgba(239, 230, 214, 0.45); padding-top: 1rem; }
+      .steps li::before { content: counter(s); font: 400 2.8rem/1 var(--display); color: var(--brass); display: block; margin-bottom: 0.5rem; }
+      .steps h3 { font-size: 1.5rem; margin-bottom: 0.4rem; }
+      .steps p { margin: 0; opacity: 0.85; }
+
+      .care { max-width: 56rem; margin: 0 auto; }
+      .faq { margin-top: 1.5rem; }
+      .faq details { border-bottom: 2px dashed #b8946b; padding: 1rem 0; }
+      .faq summary { cursor: pointer; font-weight: 700; font-size: 1.1rem; }
+      .faq p { margin: 0.5rem 0 0; max-width: 62ch; }
+
+      .contact { background: var(--tan-2); text-align: center; }
+      .contact p { font-size: 1.1rem; }
+
+      .foot { padding: 1.5rem 1rem 4.5rem; background: var(--green); color: rgba(239, 230, 214, 0.75); text-align: center; font-size: 0.9rem; }
+      .foot p { margin: 0; }
+
+      @media (max-width: 900px) {
+        .hero-head, .builder { grid-template-columns: minmax(0, 1fr); }
+        .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        nav { display: none; }
+      }
+      @media (max-width: 520px) {
+        .item-grid, .steps, .gallery { grid-template-columns: 1fr; }
+        .gallery li.tall { grid-row: auto; }
+      }
+    </style>
+  </body>
+</html>

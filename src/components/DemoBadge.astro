@@ -1,0 +1,41 @@
+---
+// Demo helper. Delete this file and its import when a template becomes a client site.
+// Add ?name=Business%20Name to any template URL to show that business's name everywhere.
+---
+<a class="lp-demo" href="/">All designs</a>
+
+<script is:inline>
+  (() => {
+    const params = new URLSearchParams(location.search);
+    const name = (params.get('name') || '').trim();
+    if (params.has('clean')) document.querySelector('.lp-demo')?.remove();
+    if (!name) return;
+    const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
+    document.querySelectorAll('[data-brand]').forEach((el) => (el.textContent = name));
+    document.querySelectorAll('[data-brand-initials]').forEach((el) => (el.textContent = initials));
+    const def = document.documentElement.dataset.defaultBrand;
+    if (def) document.title = document.title.split(def).join(name);
+    document.querySelectorAll('a[href^="/"]').forEach((a) => {
+      const url = new URL(a.href);
+      url.searchParams.set('name', name);
+      a.href = url.pathname + url.search + url.hash;
+    });
+  })();
+</script>
+
+<style>
+  .lp-demo {
+    position: fixed;
+    left: 12px;
+    bottom: 12px;
+    z-index: 999;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #1b1e24;
+    font: 500 13px/1 system-ui, sans-serif;
+    text-decoration: none;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08), 0 4px 14px rgba(0, 0, 0, 0.18);
+  }
+  .lp-demo:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+</style>

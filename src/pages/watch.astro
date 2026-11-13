@@ -1,0 +1,486 @@
+---
+import '@fontsource-variable/bodoni-moda';
+import '@fontsource-variable/jost';
+import DemoBadge from '../components/DemoBadge.astro';
+
+const brand = { name: 'Hour & Hand', town: 'Angeles City, Pampanga', phone: '0917 000 0000', messenger: 'https://m.me/yourpage' };
+
+const watches = [
+  { id: 'srpd', brand: 'Seiko', name: '5 Sports', move: 'Automatic', size: 42.5, wr: '100 m', price: 18500, cond: 'New', dial: '#1f3a5f', box: 'Box and warranty card' },
+  { id: 'presage', brand: 'Seiko', name: 'Presage Cocktail Time', move: 'Automatic', size: 40.5, wr: '50 m', price: 29000, cond: 'New', dial: '#3e7ca6', box: 'Box and warranty card' },
+  { id: 'ga2100', brand: 'Casio', name: 'G-Shock GA-2100', move: 'Quartz', size: 45.4, wr: '200 m', price: 6995, cond: 'New', dial: '#23252a', box: 'Box and manual' },
+  { id: 'bm8180', brand: 'Citizen', name: 'Eco-Drive Field', move: 'Solar', size: 42, wr: '100 m', price: 11500, cond: 'New', dial: '#2b3a2a', box: 'Box and warranty card' },
+  { id: 'bambino', brand: 'Orient', name: 'Bambino', move: 'Automatic', size: 40.5, wr: '30 m', price: 12800, cond: 'New', dial: '#ede6d6', box: 'Box and warranty card' },
+  { id: 'prx', brand: 'Tissot', name: 'PRX 40', move: 'Quartz', size: 40, wr: '100 m', price: 24500, cond: 'New', dial: '#2e5e8c', box: 'Box and warranty card' },
+  { id: 'op36', brand: 'Rolex', name: 'Oyster Perpetual 36', move: 'Automatic', size: 36, wr: '100 m', price: 520000, cond: 'Pre-owned', dial: '#6c8f6a', box: 'Box and papers, 2021' },
+  { id: 'smp', brand: 'Omega', name: 'Seamaster 300M', move: 'Automatic', size: 42, wr: '300 m', price: 310000, cond: 'Pre-owned', dial: '#23395b', box: 'Papers only, 2019' },
+];
+const peso = (n: number) => '₱' + n.toLocaleString('en-PH');
+const light = (hex: string) => parseInt(hex.slice(1, 3), 16) * 0.3 + parseInt(hex.slice(3, 5), 16) * 0.59 + parseInt(hex.slice(5, 7), 16) * 0.11 > 150;
+
+// A small dial drawn per watch, so the collection looks real before photos arrive.
+const dial = (hex: string) => {
+  const ink = light(hex) ? '#2a2620' : '#f3efe6';
+  const ticks = Array.from({ length: 12 }, (_, i) => {
+    const a = (i * 30 * Math.PI) / 180, r1 = i % 3 ? 33 : 29;
+    return `<line x1="${50 + Math.sin(a) * r1}" y1="${50 - Math.cos(a) * r1}" x2="${50 + Math.sin(a) * 37}" y2="${50 - Math.cos(a) * 37}" stroke="${ink}" stroke-width="${i % 3 ? 1.4 : 2.6}"/>`;
+  }).join('');
+  return `<rect x="36" y="-4" width="28" height="22" rx="3" class="strap"/><rect x="36" y="82" width="28" height="22" rx="3" class="strap"/>
+    <circle cx="50" cy="50" r="44" fill="#c9ced6"/><circle cx="50" cy="50" r="40" fill="${hex}"/>
+    <circle cx="50" cy="50" r="40" fill="url(#burst)"/>${ticks}
+    <line x1="50" y1="50" x2="35" y2="40" stroke="${ink}" stroke-width="3" stroke-linecap="round"/>
+    <line x1="50" y1="50" x2="68" y2="34" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="50" cy="50" r="2.6" fill="#d8bc84"/>`;
+};
+---
+<!doctype html>
+<html lang="en" data-default-brand={brand.name}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{brand.name} | New and pre-owned watches in {brand.town}</title>
+    <meta name="description" content={`New and pre-owned watches at ${brand.name}, checked and serviced in-house. Book a private viewing.`} />
+    <meta name="theme-color" content="#14213D" />
+  </head>
+  <body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <radialGradient id="burst" cx="50%" cy="45%" r="60%">
+          <stop offset="0" stop-color="#fff" stop-opacity="0.28" />
+          <stop offset="0.55" stop-color="#fff" stop-opacity="0.04" />
+          <stop offset="1" stop-color="#000" stop-opacity="0.35" />
+        </radialGradient>
+      </defs>
+    </svg>
+
+    <header class="top">
+      <a class="logo" href="#top" data-brand>{brand.name}</a>
+      <nav aria-label="Main">
+        <a href="#collection">Collection</a>
+        <a href="#service">Service</a>
+        <a href="#sell">Sell or trade</a>
+        <a href="#viewing">Book a viewing</a>
+      </nav>
+      <a class="wish-link" href="#viewing">Wishlist <span id="wish-count">0</span></a>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <h1>See it on your wrist before you decide</h1>
+          <p>New and pre-owned watches, each one checked, regulated and serviced by our watchmaker before it reaches the case. Book a private viewing and try on as many as you like.</p>
+          <div class="hero-actions">
+            <a class="btn btn-gold" href="#collection">Browse the collection</a>
+            <a class="btn btn-line" href="#viewing">Book a viewing</a>
+          </div>
+        </div>
+        <div class="hero-watch">
+          <svg viewBox="0 0 300 420" role="img" aria-labelledby="clock-label" id="clock">
+            <title id="clock-label">A watch showing the current time in Manila</title>
+            <defs>
+              <radialGradient id="sun" cx="50%" cy="40%" r="65%">
+                <stop offset="0" stop-color="#3f6aa8" />
+                <stop offset="0.6" stop-color="#1d3a6b" />
+                <stop offset="1" stop-color="#0d1c38" />
+              </radialGradient>
+            </defs>
+            <path class="band" d="M108 0H192L186 120H114Z M114 300H186L192 420H108Z" />
+            <path class="band-stitch" d="M116 8L120 110M184 8L180 110M120 310L116 412M180 310L184 412" />
+            <rect x="96" y="96" width="108" height="30" rx="8" fill="#b8bfca" />
+            <rect x="96" y="294" width="108" height="30" rx="8" fill="#b8bfca" />
+            <circle cx="150" cy="210" r="104" fill="#c9ced6" />
+            <circle cx="150" cy="210" r="98" fill="#8e96a3" />
+            <circle cx="150" cy="210" r="92" fill="url(#sun)" />
+            <rect x="252" y="200" width="14" height="20" rx="3" fill="#b8bfca" />
+            <g id="ticks"></g>
+            <text x="150" y="168" text-anchor="middle" class="dial-brand" data-brand>{brand.name}</text>
+            <text x="150" y="262" text-anchor="middle" class="dial-sub">Automatic</text>
+            <rect x="214" y="201" width="22" height="18" rx="2" fill="#f3efe6" />
+            <text x="225" y="215" text-anchor="middle" class="date" id="date">12</text>
+            <line id="h-hand" x1="150" y1="222" x2="150" y2="160" stroke="#f3efe6" stroke-width="7" stroke-linecap="round" />
+            <line id="m-hand" x1="150" y1="226" x2="150" y2="136" stroke="#f3efe6" stroke-width="4.5" stroke-linecap="round" />
+            <line id="s-hand" x1="150" y1="234" x2="150" y2="130" stroke="#d8bc84" stroke-width="1.6" />
+            <circle cx="150" cy="210" r="5" fill="#d8bc84" />
+          </svg>
+          <div class="straps" role="group" aria-label="Try a different strap">
+            <button type="button" data-strap="#7a4a2a" aria-pressed="true">Brown leather</button>
+            <button type="button" data-strap="#b8bfca" data-metal aria-pressed="false">Steel bracelet</button>
+            <button type="button" data-strap="#22252b" aria-pressed="false">Black rubber</button>
+            <button type="button" data-strap="#5d6b3e" aria-pressed="false">Olive canvas</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="collection" class="collection">
+        <div class="col-head">
+          <h2>The collection</h2>
+          <div class="filters" role="group" aria-label="Filter the collection">
+            {['All', 'Automatic', 'Quartz', 'Solar', 'Pre-owned'].map((f, i) => (
+              <button type="button" data-filter={f} aria-pressed={i === 0 ? 'true' : 'false'}>{f}</button>
+            ))}
+          </div>
+          <label class="sort">Sort
+            <select id="sort"><option value="new">Newest in</option><option value="low">Price, low to high</option><option value="high">Price, high to low</option></select>
+          </label>
+        </div>
+        <ul class="grid" id="grid">
+          {watches.map((w, i) => (
+            <li class="piece" data-id={w.id} data-move={w.move} data-cond={w.cond} data-price={w.price} data-order={i}>
+              <button type="button" class="open" data-open={w.id} aria-label={`Quick view: ${w.brand} ${w.name}`}>
+                <svg viewBox="0 -6 100 112" aria-hidden="true" set:html={dial(w.dial)} />
+              </button>
+              <div class="p-info">
+                <p class="p-brand">{w.brand}</p>
+                <h3>{w.name}</h3>
+                <p class="p-meta">{w.move}, {w.size} mm{w.cond === 'Pre-owned' && <span class="pre">Pre-owned</span>}</p>
+                <p class="p-price">{peso(w.price)}</p>
+              </div>
+              <button type="button" class="heart" data-wish={w.id} aria-pressed="false" aria-label={`Save ${w.brand} ${w.name} to wishlist`}>♡</button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section id="service" class="service">
+        <div>
+          <h2>Service at the counter</h2>
+          <p class="lede">Our watchmaker works in view of the shop, so you can watch your piece being opened.</p>
+        </div>
+        <ul class="svc-list">
+          <li><span>Battery replacement and seal check</span><span>₱350</span></li>
+          <li><span>Strap or bracelet fitting</span><span>₱200</span></li>
+          <li><span>Timing and regulation, automatic</span><span>₱1,200</span></li>
+          <li><span>Full service, automatic</span><span>from ₱6,500</span></li>
+          <li><span>Case and bracelet polishing</span><span>from ₱2,500</span></li>
+          <li><span>Authentication check with written report</span><span>₱1,500</span></li>
+        </ul>
+      </section>
+
+      <section id="sell" class="sell">
+        <form class="sell-form" id="sell-form">
+          <h2>Sell or trade your watch</h2>
+          <p>Send the details and two photos on Messenger. We reply with a cash offer and a trade-in value within two days.</p>
+          <div class="sell-grid">
+            <label>Brand <input name="brand" required /></label>
+            <label>Model <input name="model" required /></label>
+            <label>Year bought <input name="year" inputmode="numeric" maxlength="4" /></label>
+            <label>What comes with it
+              <select name="box"><option>Box and papers</option><option>Papers only</option><option>Box only</option><option>Watch only</option></select>
+            </label>
+          </div>
+          <button class="btn btn-gold" type="submit">Get an offer</button>
+          <p class="note" id="sell-ok" hidden></p>
+        </form>
+      </section>
+
+      <section id="viewing" class="viewing">
+        <form class="view-form" id="view-form">
+          <h2>Book a private viewing</h2>
+          <p>Thirty minutes at a quiet counter with the pieces you choose ready on a tray.</p>
+          <fieldset>
+            <legend>Pieces to bring out</legend>
+            <div id="picks" class="picks"><p class="empty">Tap the heart on any watch to add it here, or leave this empty and we'll show you around.</p></div>
+          </fieldset>
+          <div class="sell-grid">
+            <label>Name <input name="who" required autocomplete="name" /></label>
+            <label>Mobile number <input name="tel" required inputmode="tel" autocomplete="tel" /></label>
+            <label>Day <input name="day" type="date" required /></label>
+            <label>Time <select name="time"><option>11:00 AM</option><option>1:00 PM</option><option>3:00 PM</option><option>5:00 PM</option></select></label>
+          </div>
+          <button class="btn btn-gold" type="submit">Book viewing</button>
+          <p class="note" id="view-ok" hidden></p>
+        </form>
+        <div class="visit">
+          <p><strong data-brand>{brand.name}</strong></p>
+          <p>Your street address<br />{brand.town}</p>
+          <p>Tuesday to Sunday, 11 AM to 8 PM</p>
+          <p><a href={`tel:${brand.phone.replace(/\s/g, '')}`}>{brand.phone}</a></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot"><p>&copy; <span data-brand>{brand.name}</span>. Every pre-owned watch comes with a 1-year movement warranty.</p></footer>
+
+    <dialog class="quick" id="quick" aria-labelledby="q-name">
+      <button type="button" class="q-close" id="q-close">Close</button>
+      <div class="q-grid">
+        <div class="q-dial" id="q-dial"></div>
+        <div>
+          <p class="p-brand" id="q-brand"></p>
+          <h3 id="q-name"></h3>
+          <p class="q-price" id="q-price"></p>
+          <dl class="q-specs" id="q-specs"></dl>
+          <div class="q-actions">
+            <button type="button" class="btn btn-gold" id="q-wish"></button>
+            <a class="btn btn-line" href="#viewing" id="q-view">Book a viewing</a>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <script type="application/json" id="watch-data" set:html={JSON.stringify(watches)} />
+    <DemoBadge />
+
+    <script>
+      type W = { id: string; brand: string; name: string; move: string; size: number; wr: string; price: number; cond: string; box: string };
+      const watches: W[] = JSON.parse(document.getElementById('watch-data')!.textContent!);
+      const byId = Object.fromEntries(watches.map((w) => [w.id, w]));
+      const peso = (n: number) => '₱' + n.toLocaleString('en-PH');
+      const $ = (id: string) => document.getElementById(id)!;
+
+      // Live clock in Manila time
+      const ticks = $('ticks');
+      for (let i = 0; i < 60; i++) {
+        const a = (i * 6 * Math.PI) / 180, major = i % 5 === 0;
+        const r1 = major ? 74 : 82;
+        ticks.insertAdjacentHTML('beforeend', `<line x1="${150 + Math.sin(a) * r1}" y1="${210 - Math.cos(a) * r1}" x2="${150 + Math.sin(a) * 86}" y2="${210 - Math.cos(a) * 86}" stroke="${major ? '#f3efe6' : '#9fb0cc'}" stroke-width="${major ? 3.5 : 1}"/>`);
+      }
+      const parts = new Intl.DateTimeFormat('en-PH', { timeZone: 'Asia/Manila', hour: 'numeric', minute: 'numeric', second: 'numeric', day: 'numeric', hour12: false });
+      function tick() {
+        const p = Object.fromEntries(parts.formatToParts(new Date()).map((x) => [x.type, x.value]));
+        const h = Number(p.hour) % 12, m = Number(p.minute), s = Number(p.second);
+        $('h-hand').setAttribute('transform', `rotate(${h * 30 + m * 0.5} 150 210)`);
+        $('m-hand').setAttribute('transform', `rotate(${m * 6 + s * 0.1} 150 210)`);
+        $('s-hand').setAttribute('transform', `rotate(${s * 6} 150 210)`);
+        $('date').textContent = p.day;
+      }
+      tick();
+      setInterval(tick, 1000);
+
+      // Strap swap
+      const clock = $('clock');
+      document.querySelectorAll<HTMLButtonElement>('[data-strap]').forEach((b) =>
+        b.addEventListener('click', () => {
+          document.querySelectorAll('[data-strap]').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+          b.setAttribute('aria-pressed', 'true');
+          clock.style.setProperty('--strap', b.dataset.strap!);
+          clock.classList.toggle('metal', b.hasAttribute('data-metal'));
+        })
+      );
+
+      // Filter and sort
+      const grid = $('grid');
+      const pieces = [...document.querySelectorAll<HTMLElement>('.piece')];
+      document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((b) =>
+        b.addEventListener('click', () => {
+          document.querySelectorAll('[data-filter]').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+          b.setAttribute('aria-pressed', 'true');
+          const f = b.dataset.filter!;
+          pieces.forEach((p) => (p.hidden = !(f === 'All' || p.dataset.move === f || p.dataset.cond === f)));
+        })
+      );
+      ($('sort') as HTMLSelectElement).addEventListener('change', (e) => {
+        const v = (e.target as HTMLSelectElement).value;
+        const key = (p: HTMLElement) => (v === 'new' ? Number(p.dataset.order) : Number(p.dataset.price));
+        [...pieces].sort((a, b) => (v === 'high' ? key(b) - key(a) : key(a) - key(b))).forEach((p) => grid.append(p));
+      });
+
+      // Wishlist
+      const KEY = 'watch-wishlist';
+      let wish: string[] = [];
+      try { wish = JSON.parse(localStorage.getItem(KEY) || '[]').filter((id: string) => byId[id]); } catch {}
+      const toggle = (id: string) => {
+        wish = wish.includes(id) ? wish.filter((x) => x !== id) : [...wish, id];
+        try { localStorage.setItem(KEY, JSON.stringify(wish)); } catch {}
+        paintWish();
+      };
+      function paintWish() {
+        $('wish-count').textContent = String(wish.length);
+        document.querySelectorAll<HTMLButtonElement>('[data-wish]').forEach((b) => {
+          const on = wish.includes(b.dataset.wish!);
+          b.setAttribute('aria-pressed', String(on));
+          b.textContent = on ? '♥' : '♡';
+        });
+        const picks = $('picks');
+        picks.innerHTML = wish.length
+          ? wish.map((id) => `<label class="pick"><input type="checkbox" name="pieces" value="${id}" checked /> ${byId[id].brand} ${byId[id].name} <span>${peso(byId[id].price)}</span></label>`).join('')
+          : '<p class="empty">Tap the heart on any watch to add it here, or leave this empty and we\'ll show you around.</p>';
+        if (current) $('q-wish').textContent = wish.includes(current) ? 'Saved to wishlist' : 'Save to wishlist';
+      }
+      document.addEventListener('click', (e) => {
+        const b = (e.target as HTMLElement).closest<HTMLElement>('[data-wish]');
+        if (b) toggle(b.dataset.wish!);
+      });
+
+      // Quick view
+      const quick = $('quick') as HTMLDialogElement;
+      let current = '';
+      document.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((b) =>
+        b.addEventListener('click', () => {
+          const w = byId[b.dataset.open!];
+          current = w.id;
+          $('q-dial').innerHTML = '';
+          $('q-dial').append(b.querySelector('svg')!.cloneNode(true));
+          $('q-brand').textContent = w.brand;
+          $('q-name').textContent = w.name;
+          $('q-price').textContent = peso(w.price);
+          $('q-specs').innerHTML = [['Movement', w.move], ['Case size', `${w.size} mm`], ['Water resistance', w.wr], ['Condition', w.cond], ['Comes with', w.box]].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+          $('q-wish').dataset.wish = w.id;
+          paintWish();
+          quick.showModal();
+        })
+      );
+      $('q-close').addEventListener('click', () => quick.close());
+      $('q-view').addEventListener('click', () => { if (!wish.includes(current)) toggle(current); quick.close(); });
+      quick.addEventListener('click', (e) => { if (e.target === quick) quick.close(); });
+
+      // Forms
+      const day = document.querySelector<HTMLInputElement>('#view-form input[name=day]')!;
+      const t = new Date(); t.setDate(t.getDate() + 1);
+      day.min = new Date(t.getTime() - t.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+      ($('view-form') as HTMLFormElement).addEventListener('submit', (e) => {
+        e.preventDefault();
+        const d = new FormData(e.target as HTMLFormElement);
+        const n = d.getAll('pieces').length;
+        $('view-ok').hidden = false;
+        $('view-ok').textContent = `Viewing booked for ${d.get('day')} at ${d.get('time')}${n ? `, with ${n} ${n === 1 ? 'piece' : 'pieces'} on your tray` : ''}. We'll text you to confirm.`;
+      });
+      ($('sell-form') as HTMLFormElement).addEventListener('submit', (e) => {
+        e.preventDefault();
+        const d = new FormData(e.target as HTMLFormElement);
+        $('sell-ok').hidden = false;
+        $('sell-ok').textContent = `Got it. Send two photos of your ${d.get('brand')} ${d.get('model')} on Messenger and we'll reply with an offer within two days.`;
+      });
+
+      paintWish();
+    </script>
+
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      :root {
+        --midnight: #14213d;
+        --navy: #1c2c4f;
+        --navy-3: #26385f;
+        --gold: #d8bc84;
+        --ivory: #f3efe6;
+        --steel: #a9b3c4;
+        --display: 'Bodoni Moda Variable', 'Didot', serif;
+        --text: 'Jost Variable', system-ui, sans-serif;
+      }
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      body { margin: 0; background: var(--midnight); color: var(--ivory); font: 400 1.0625rem/1.65 var(--text); }
+      h1, h2, h3 { font-family: var(--display); font-weight: 500; margin: 0; line-height: 1.08; }
+      a { color: inherit; }
+      :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+      .strap { fill: #3a3f4a; }
+    </style>
+
+    <style>
+      .top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 2rem; padding: 1rem clamp(1rem, 4vw, 3rem); background: rgba(20, 33, 61, 0.94); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(216, 188, 132, 0.25); }
+      .logo { font: 500 1.5rem/1 var(--display); text-decoration: none; color: var(--gold); }
+      nav { display: flex; gap: 1.6rem; margin-left: auto; }
+      nav a { text-decoration: none; color: var(--steel); }
+      nav a:hover { color: var(--ivory); }
+      .wish-link { text-decoration: none; display: flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(216, 188, 132, 0.5); padding: 0.45rem 0.9rem; border-radius: 999px; }
+      .wish-link span { color: var(--gold); font-weight: 600; }
+
+      .btn { display: inline-block; padding: 0.85rem 1.5rem; border-radius: 999px; font: 500 1rem/1 var(--text); letter-spacing: 0.02em; text-decoration: none; cursor: pointer; border: 1px solid var(--gold); text-align: center; }
+      .btn-gold { background: var(--gold); color: var(--midnight); }
+      .btn-gold:hover { background: #e5cc98; }
+      .btn-line { background: transparent; color: var(--gold); }
+      .btn-line:hover { background: rgba(216, 188, 132, 0.12); }
+
+      section { padding: clamp(3rem, 7vw, 6rem) clamp(1rem, 4vw, 3rem); }
+      h2 { font-size: clamp(2.2rem, 4.8vw, 3.6rem); }
+      .lede { color: var(--steel); max-width: 48ch; }
+
+      .hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; max-width: 84rem; margin: 0 auto; }
+      .hero h1 { font-size: clamp(2.8rem, 6.5vw, 5.6rem); font-style: italic; font-weight: 400; max-width: 12ch; }
+      .hero-copy p { color: var(--steel); font-size: 1.15rem; max-width: 46ch; margin: 1.5rem 0 2.25rem; }
+      .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+      .hero-watch { display: grid; justify-items: center; gap: 1.25rem; }
+      #clock { width: min(100%, 22rem); height: auto; --strap: #7a4a2a; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.45)); }
+      #clock .band { fill: var(--strap); transition: fill 0.3s; }
+      #clock .band-stitch { fill: none; stroke: rgba(255, 255, 255, 0.35); stroke-width: 1.2; stroke-dasharray: 4 3; }
+      #clock.metal .band-stitch { stroke: rgba(20, 33, 61, 0.35); stroke-dasharray: 2 10; stroke-width: 3; }
+      @media (prefers-reduced-motion: reduce) { #clock .band { transition: none; } }
+      .dial-brand { font: 500 13px var(--display); fill: var(--ivory); letter-spacing: 0.04em; }
+      .dial-sub { font: 400 9px var(--text); fill: var(--steel); letter-spacing: 0.12em; }
+      .date { font: 600 11px var(--text); fill: var(--midnight); }
+      .straps { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+      .straps button { background: none; border: 1px solid rgba(169, 179, 196, 0.45); color: var(--steel); padding: 0.4rem 0.85rem; border-radius: 999px; font: 400 0.9rem var(--text); cursor: pointer; }
+      .straps button[aria-pressed='true'] { border-color: var(--gold); color: var(--gold); }
+
+      .collection { background: var(--navy); }
+      .col-head { display: flex; align-items: end; gap: 1.5rem 2rem; flex-wrap: wrap; max-width: 84rem; margin: 0 auto 2rem; }
+      .filters { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-left: auto; }
+      .filters button { background: none; border: 1px solid rgba(169, 179, 196, 0.35); color: var(--steel); padding: 0.45rem 0.95rem; border-radius: 999px; font: 400 0.95rem var(--text); cursor: pointer; }
+      .filters button[aria-pressed='true'] { background: var(--ivory); color: var(--midnight); border-color: var(--ivory); }
+      .sort { display: flex; align-items: center; gap: 0.5rem; color: var(--steel); }
+      .sort select { font: inherit; background: var(--navy-3); color: var(--ivory); border: 1px solid rgba(169, 179, 196, 0.35); border-radius: 8px; padding: 0.4rem 0.6rem; }
+      .grid { list-style: none; margin: 0 auto; padding: 0; max-width: 84rem; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: rgba(169, 179, 196, 0.18); border: 1px solid rgba(169, 179, 196, 0.18); }
+      .piece { position: relative; background: var(--navy); padding: 1.5rem 1.25rem 1.25rem; display: flex; flex-direction: column; }
+      .open { background: radial-gradient(circle at 50% 45%, var(--navy-3), transparent 70%); border: 0; padding: 1rem 2rem; cursor: zoom-in; border-radius: 8px; }
+      .open svg { width: 100%; max-width: 9rem; height: auto; display: block; margin: 0 auto; }
+      .open:hover svg { transform: scale(1.04); }
+      @media (prefers-reduced-motion: no-preference) { .open svg { transition: transform 0.25s; } }
+      .p-info { margin-top: 1rem; }
+      .p-brand { margin: 0; color: var(--gold); font-size: 0.9rem; letter-spacing: 0.04em; }
+      .piece h3 { font-size: 1.35rem; margin: 0.15rem 0 0.25rem; }
+      .p-meta { margin: 0; color: var(--steel); font-size: 0.92rem; }
+      .pre { margin-left: 0.5rem; padding: 0.05rem 0.5rem; border: 1px solid var(--gold); color: var(--gold); border-radius: 999px; font-size: 0.78rem; }
+      .p-price { margin: 0.6rem 0 0; font: 500 1.25rem var(--display); }
+      .heart { position: absolute; top: 0.75rem; right: 0.75rem; width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 1px solid rgba(169, 179, 196, 0.35); background: transparent; color: var(--steel); font-size: 1.2rem; cursor: pointer; }
+      .heart[aria-pressed='true'] { color: var(--gold); border-color: var(--gold); }
+
+      .service { display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; max-width: 84rem; margin: 0 auto; }
+      .svc-list { list-style: none; margin: 0; padding: 0; }
+      .svc-list li { display: flex; justify-content: space-between; gap: 1.5rem; padding: 1rem 0; border-bottom: 1px solid rgba(169, 179, 196, 0.2); }
+      .svc-list li span:last-child { color: var(--gold); font-family: var(--display); font-size: 1.15rem; white-space: nowrap; }
+
+      .sell { background: var(--ivory); color: var(--midnight); }
+      .sell-form, .view-form { display: grid; gap: 1.1rem; max-width: 46rem; }
+      .sell-form p, .view-form > p { margin: 0; color: #4b5670; }
+      .sell-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+      .sell-grid label { display: grid; gap: 0.3rem; font-weight: 500; font-size: 0.95rem; }
+      input, select { font: inherit; padding: 0.65rem 0.8rem; border-radius: 8px; border: 1px solid #c9c2b2; background: #fff; color: var(--midnight); }
+      .sell .btn-gold { background: var(--midnight); color: var(--ivory); border-color: var(--midnight); justify-self: start; }
+      .note { padding: 0.75rem 1rem; border-left: 3px solid var(--gold); background: rgba(216, 188, 132, 0.15); }
+
+      .viewing { display: grid; grid-template-columns: 1.5fr 1fr; gap: 3rem; max-width: 84rem; margin: 0 auto; align-items: start; }
+      .view-form > p { color: var(--steel); }
+      .view-form .btn { justify-self: start; }
+      .view-form .note { color: var(--ivory); }
+      fieldset { border: 1px solid rgba(169, 179, 196, 0.3); border-radius: 12px; padding: 1rem 1.1rem; margin: 0; }
+      legend { padding: 0 0.4rem; color: var(--gold); }
+      .picks { display: grid; gap: 0.4rem; }
+      .picks :global(.pick) { display: flex; align-items: center; gap: 0.6rem; }
+      .picks :global(.pick span) { margin-left: auto; color: var(--steel); }
+      .picks :global(input) { accent-color: var(--gold); }
+      .picks :global(.empty) { margin: 0; color: var(--steel); }
+      .visit { border-left: 1px solid rgba(216, 188, 132, 0.35); padding-left: 2rem; color: var(--steel); }
+      .visit strong { font: 500 1.6rem var(--display); color: var(--gold); }
+
+      .foot { padding: 1.5rem 1rem 4.5rem; text-align: center; color: var(--steel); font-size: 0.9rem; border-top: 1px solid rgba(169, 179, 196, 0.2); }
+      .foot p { margin: 0; }
+
+      .quick { width: min(100% - 2rem, 50rem); border: 1px solid rgba(216, 188, 132, 0.4); border-radius: 16px; padding: 2rem; background: var(--navy); color: var(--ivory); }
+      .quick::backdrop { background: rgba(8, 14, 28, 0.7); }
+      .q-close { position: absolute; top: 1rem; right: 1rem; background: none; border: 1px solid rgba(169, 179, 196, 0.4); color: var(--steel); border-radius: 999px; padding: 0.35rem 0.85rem; cursor: pointer; font: inherit; font-size: 0.9rem; }
+      .q-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 2rem; align-items: center; }
+      .q-dial { background: radial-gradient(circle at 50% 45%, var(--navy-3), transparent 70%); padding: 1rem; }
+      .q-dial :global(svg) { width: 100%; height: auto; display: block; }
+      .quick h3 { font-size: 2rem; margin: 0.25rem 0; }
+      .q-price { font: 500 1.6rem var(--display); color: var(--gold); margin: 0.25rem 0 1rem; }
+      .q-specs { margin: 0 0 1.5rem; }
+      .q-specs :global(div) { display: flex; justify-content: space-between; gap: 1rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(169, 179, 196, 0.2); }
+      .q-specs :global(dt) { color: var(--steel); }
+      .q-specs :global(dd) { margin: 0; text-align: right; }
+      .q-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+      @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+      @media (max-width: 820px) {
+        nav { display: none; }
+        .wish-link { margin-left: auto; }
+        .hero, .service, .viewing, .q-grid { grid-template-columns: 1fr; }
+        .filters { margin-left: 0; }
+        .visit { border-left: 0; padding-left: 0; }
+      }
+      @media (max-width: 520px) {
+        .grid, .sell-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </body>
+</html>

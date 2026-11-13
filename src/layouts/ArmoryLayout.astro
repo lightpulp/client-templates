@@ -1,0 +1,255 @@
+---
+import '@fontsource/chakra-petch/500.css';
+import '@fontsource/chakra-petch/600.css';
+import '@fontsource/chakra-petch/700.css';
+import '@fontsource-variable/saira';
+import DemoBadge from '../components/DemoBadge.astro';
+import { products, peso, brand } from '../data/armory';
+
+interface Props { title: string; description: string }
+const { title, description } = Astro.props;
+const lookup = Object.fromEntries(products.map((p) => [p.slug, { name: `${p.brand} ${p.name}`, price: peso(p.price) }]));
+---
+<!doctype html>
+<html lang="en" data-default-brand={brand.name}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title.replace('{brand}', brand.name)}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#2B363C" />
+  </head>
+  <body>
+    <p class="notice">Licensed dealer. Firearms are released in store to buyers with a valid LTOPF and the required PNP-FEO permits.</p>
+    <header class="head">
+      <a class="logo" href="/armory"><span class="logo-mark" aria-hidden="true" data-brand-initials>NA</span><span data-brand>{brand.name}</span></a>
+      <form class="search" action="/armory" role="search">
+        <label class="sr" for="q">Search inventory</label>
+        <input id="q" name="q" type="search" placeholder="Search model, brand or caliber" autocomplete="off" />
+        <input type="hidden" name="name" id="keep-name" disabled />
+      </form>
+      <nav aria-label="Main">
+        <a href="/armory#inventory">Inventory</a>
+        <a href="/armory#services">Services</a>
+        <a href="/armory#visit">Visit</a>
+      </nav>
+      <button class="list-btn" type="button" id="open-list" aria-haspopup="dialog">Inquiry list <span class="count" id="count">0</span></button>
+    </header>
+
+    <slot />
+
+    <footer class="foot" id="visit">
+      <div>
+        <p class="foot-name" data-brand>{brand.name}</p>
+        <p>Your street address<br />{brand.town}</p>
+      </div>
+      <div>
+        <p class="foot-h">Store hours</p>
+        <p>Monday to Saturday, 9 AM to 6 PM<br />Sunday by appointment</p>
+      </div>
+      <div>
+        <p class="foot-h">Contact</p>
+        <p><a href={`tel:${brand.phone.replace(/\s/g, '')}`}>{brand.phone}</a><br /><a href={brand.messenger}>Message us on Facebook</a></p>
+      </div>
+      <p class="foot-legal">Prices and stock are for reference and can change without notice. Sample inventory shown.</p>
+    </footer>
+
+    <dialog class="drawer" id="list" aria-labelledby="list-title">
+      <div class="drawer-head">
+        <h2 id="list-title">Your inquiry list</h2>
+        <button type="button" class="x" id="close-list" aria-label="Close inquiry list">Close</button>
+      </div>
+      <p class="drawer-empty" id="list-empty">Your list is empty. Add items from the inventory to ask about price, stock or a reservation.</p>
+      <ul class="drawer-items" id="list-items"></ul>
+      <form class="drawer-form" id="list-form">
+        <label>Name <input name="who" required autocomplete="name" /></label>
+        <label>Mobile number <input name="tel" required inputmode="tel" autocomplete="tel" /></label>
+        <label>When can you visit? <input name="when" type="date" /></label>
+        <label>Questions for the shop <textarea name="note" rows="3" placeholder="e.g. Can you hold this until Saturday?"></textarea></label>
+        <button class="btn btn-fde" type="submit">Send inquiry</button>
+        <div class="drawer-sent" id="list-sent" hidden>
+          <p>Inquiry ready. Send it by text or Messenger and the shop will reply with stock and price.</p>
+          <a class="btn btn-fde" id="list-sms">Send by text</a>
+          <a class="btn btn-ghost" href={brand.messenger}>Open Messenger</a>
+        </div>
+      </form>
+    </dialog>
+
+    <script type="application/json" id="armory-data" set:html={JSON.stringify(lookup)} />
+    <DemoBadge />
+
+    <script>
+      const KEY = 'armory-inquiry';
+      const data: Record<string, { name: string; price: string }> = JSON.parse(document.getElementById('armory-data')!.textContent || '{}');
+      const read = (): string[] => { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } };
+      let list = read().filter((s) => data[s]);
+      const save = () => { try { localStorage.setItem(KEY, JSON.stringify(list)); } catch {} };
+
+      const dialog = document.getElementById('list') as HTMLDialogElement;
+      const items = document.getElementById('list-items')!;
+      const empty = document.getElementById('list-empty')!;
+      const form = document.getElementById('list-form') as HTMLFormElement;
+      const sent = document.getElementById('list-sent')!;
+
+      function render() {
+        document.getElementById('count')!.textContent = String(list.length);
+        items.innerHTML = '';
+        list.forEach((slug) => {
+          const li = document.createElement('li');
+          li.innerHTML = `<span><strong></strong><small></small></span><button type="button" data-remove="${slug}">Remove</button>`;
+          li.querySelector('strong')!.textContent = data[slug].name;
+          li.querySelector('small')!.textContent = data[slug].price;
+          items.append(li);
+        });
+        empty.hidden = list.length > 0;
+        form.hidden = list.length === 0;
+        document.querySelectorAll<HTMLButtonElement>('[data-add]').forEach((b) => {
+          const on = list.includes(b.dataset.add!);
+          b.setAttribute('aria-pressed', String(on));
+          b.textContent = on ? 'In your list' : 'Add to inquiry list';
+        });
+      }
+
+      document.addEventListener('click', (e) => {
+        const t = e.target as HTMLElement;
+        const add = t.closest<HTMLElement>('[data-add]');
+        const rem = t.closest<HTMLElement>('[data-remove]');
+        if (add) {
+          const s = add.dataset.add!;
+          list = list.includes(s) ? list.filter((x) => x !== s) : [...list, s];
+        } else if (rem) {
+          list = list.filter((x) => x !== rem.dataset.remove);
+        } else return;
+        save();
+        render();
+      });
+
+      document.getElementById('open-list')!.addEventListener('click', () => dialog.showModal());
+      document.getElementById('close-list')!.addEventListener('click', () => dialog.close());
+      dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const d = new FormData(form);
+        const msg = `Inquiry from ${d.get('who')} (${d.get('tel')})\n${list.map((s) => `- ${data[s].name}, ${data[s].price}`).join('\n')}${d.get('when') ? `\nVisit: ${d.get('when')}` : ''}${d.get('note') ? `\n${d.get('note')}` : ''}`;
+        (document.getElementById('list-sms') as HTMLAnchorElement).href = `sms:?&body=${encodeURIComponent(msg)}`;
+        sent.hidden = false;
+      });
+
+      // Keep the demo business name when the header search is used.
+      const nm = new URLSearchParams(location.search).get('name');
+      const keep = document.getElementById('keep-name') as HTMLInputElement;
+      if (nm) { keep.value = nm; keep.disabled = false; }
+
+      render();
+    </script>
+
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      :root {
+        --steel: #2b363c;
+        --panel: #34424a;
+        --raised: #3e4e57;
+        --edge: #52636c;
+        --text: #e8eae5;
+        --muted: #a5b0b2;
+        --fde: #cbaa72;
+        --in: #93b97f;
+        --low: #e0b14a;
+        --out: #e07a62;
+        --head: 'Chakra Petch', sans-serif;
+        --body: 'Saira Variable', system-ui, sans-serif;
+      }
+      body { margin: 0; background: var(--steel); color: var(--text); font: 400 1rem/1.55 var(--body); }
+      h1, h2, h3 { font-family: var(--head); font-weight: 700; line-height: 1.05; margin: 0; }
+      a { color: inherit; }
+      :focus-visible { outline: 2px solid var(--fde); outline-offset: 2px; }
+      .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+      .wrap { width: min(100% - 2.5rem, 78rem); margin-inline: auto; }
+
+      .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.7rem 1.1rem; font: 600 0.98rem/1 var(--head); border: 1px solid transparent; border-radius: 2px; cursor: pointer; text-decoration: none; }
+      .btn-fde { background: var(--fde); color: #23292c; }
+      .btn-fde:hover { background: #d9bb86; }
+      .btn-ghost { background: transparent; color: var(--text); border-color: var(--edge); }
+      .btn-ghost:hover { border-color: var(--fde); }
+      [data-add] { width: 100%; background: transparent; color: var(--text); border: 1px solid var(--edge); padding: 0.6rem; font: 600 0.92rem/1 var(--head); border-radius: 2px; cursor: pointer; }
+      [data-add]:hover { border-color: var(--fde); color: var(--fde); }
+      [data-add][aria-pressed='true'] { background: var(--fde); border-color: var(--fde); color: #23292c; }
+      [data-add]:disabled { opacity: 0.45; cursor: not-allowed; }
+
+      .stock { display: inline-flex; align-items: center; gap: 0.35rem; font: 600 0.85rem/1 var(--head); }
+      .stock::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+      .stock-in { color: var(--in); }
+      .stock-low { color: var(--low); }
+      .stock-out { color: var(--out); }
+
+      /* Photo placeholder with scope-style corner brackets */
+      .frame {
+        position: relative; display: grid; place-items: center; aspect-ratio: 4 / 3;
+        background: radial-gradient(ellipse at center, #435560 0%, #36454d 70%);
+        color: #7f9199;
+      }
+      .frame::before {
+        content: ''; position: absolute; inset: 10px;
+        background:
+          linear-gradient(var(--fde), var(--fde)) top left / 16px 2px no-repeat,
+          linear-gradient(var(--fde), var(--fde)) top left / 2px 16px no-repeat,
+          linear-gradient(var(--fde), var(--fde)) top right / 16px 2px no-repeat,
+          linear-gradient(var(--fde), var(--fde)) top right / 2px 16px no-repeat,
+          linear-gradient(var(--fde), var(--fde)) bottom left / 16px 2px no-repeat,
+          linear-gradient(var(--fde), var(--fde)) bottom left / 2px 16px no-repeat,
+          linear-gradient(var(--fde), var(--fde)) bottom right / 16px 2px no-repeat,
+          linear-gradient(var(--fde), var(--fde)) bottom right / 2px 16px no-repeat;
+        opacity: 0.7;
+      }
+      .frame svg { width: 62%; height: auto; fill: currentColor; }
+    </style>
+
+    <style>
+      .notice { margin: 0; padding: 0.45rem 1.25rem; background: #222b30; color: var(--muted); font-size: 0.85rem; text-align: center; }
+      .head { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 1.25rem; padding: 0.75rem clamp(1rem, 3vw, 2.5rem); background: rgba(43, 54, 60, 0.96); backdrop-filter: blur(6px); border-bottom: 1px solid var(--edge); }
+      .logo { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; font: 700 1.2rem/1 var(--head); white-space: nowrap; }
+      .logo-mark { display: grid; place-items: center; width: 36px; height: 36px; border: 2px solid var(--fde); color: var(--fde); font-size: 0.9rem; letter-spacing: 0.02em; }
+      .search { flex: 1; max-width: 30rem; }
+      .search input { width: 100%; font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--edge); padding: 0.6rem 0.85rem; border-radius: 2px; }
+      .search input::placeholder { color: #8796a0; }
+      nav { display: flex; gap: 1.1rem; margin-left: auto; }
+      nav a { text-decoration: none; color: var(--muted); font-weight: 500; }
+      nav a:hover { color: var(--text); }
+      .list-btn { display: flex; align-items: center; gap: 0.5rem; font: 600 0.95rem/1 var(--head); color: #23292c; background: var(--fde); border: 0; padding: 0.6rem 0.9rem; border-radius: 2px; cursor: pointer; white-space: nowrap; }
+      .count { display: grid; place-items: center; min-width: 1.4rem; height: 1.4rem; background: #23292c; color: var(--fde); border-radius: 2px; font-size: 0.8rem; }
+
+      .foot { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; padding: 3rem clamp(1rem, 3vw, 2.5rem) 4.5rem; background: #232c31; color: var(--muted); border-top: 1px solid var(--edge); }
+      .foot p { margin: 0; }
+      .foot-name { font: 700 1.3rem/1.2 var(--head); color: var(--text); margin-bottom: 0.5rem !important; }
+      .foot-h { font: 600 1rem/1.2 var(--head); color: var(--text); margin-bottom: 0.4rem !important; }
+      .foot-legal { grid-column: 1 / -1; font-size: 0.85rem; border-top: 1px solid var(--edge); padding-top: 1rem; }
+
+      .drawer { margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; width: min(100%, 26rem); padding: 1.5rem; border: 0; border-left: 1px solid var(--edge); background: var(--panel); color: var(--text); }
+      .drawer::backdrop { background: rgba(20, 26, 29, 0.6); }
+      .drawer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+      .drawer-head h2 { font-size: 1.5rem; }
+      .x { background: none; border: 1px solid var(--edge); color: var(--text); padding: 0.4rem 0.7rem; cursor: pointer; font: 500 0.9rem var(--head); }
+      .drawer-empty { color: var(--muted); }
+      .drawer-items { list-style: none; margin: 0 0 1.25rem; padding: 0; }
+      .drawer-items :global(li) { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--edge); }
+      .drawer-items :global(strong) { display: block; font-weight: 600; }
+      .drawer-items :global(small) { color: var(--fde); font: 600 0.95rem var(--head); }
+      .drawer-items :global(button) { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font: inherit; font-size: 0.85rem; }
+      .drawer-form { display: grid; gap: 0.75rem; }
+      .drawer-form label { display: grid; gap: 0.3rem; font-size: 0.92rem; color: var(--muted); }
+      .drawer-form input, .drawer-form textarea { font: inherit; color: var(--text); background: var(--steel); border: 1px solid var(--edge); padding: 0.55rem 0.7rem; border-radius: 2px; }
+      .drawer-sent { display: grid; gap: 0.5rem; padding: 1rem; background: var(--steel); border-left: 3px solid var(--in); }
+      .drawer-sent p { margin: 0 0 0.25rem; }
+
+      @media (max-width: 900px) {
+        nav { display: none; }
+        .head { flex-wrap: wrap; }
+        .search { order: 3; flex-basis: 100%; max-width: none; }
+        .list-btn { margin-left: auto; }
+        .foot { grid-template-columns: 1fr; }
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,526 @@
+---
+import '@fontsource/barlow-condensed/600.css';
+import '@fontsource/barlow-condensed/800.css';
+import '@fontsource/barlow/400.css';
+import '@fontsource/barlow/500.css';
+import '@fontsource/barlow/600.css';
+import DemoBadge from '../components/DemoBadge.astro';
+
+const brand = { name: 'Riverside Shooting Range', town: 'Bacolor, Pampanga', phone: '0917 000 0000', messenger: 'https://m.me/yourpage' };
+
+const lanes = [
+  { id: 1, kind: 'Pistol', dist: '25 m', rate: 350 },
+  { id: 2, kind: 'Pistol', dist: '25 m', rate: 350 },
+  { id: 3, kind: 'Pistol', dist: '25 m', rate: 350 },
+  { id: 4, kind: 'Pistol', dist: '25 m', rate: 350 },
+  { id: 5, kind: 'Pistol', dist: '25 m', rate: 350 },
+  { id: 6, kind: 'Pistol', dist: '25 m', rate: 350 },
+  { id: 7, kind: 'Rifle', dist: '50 m', rate: 600 },
+  { id: 8, kind: 'Rifle', dist: '50 m', rate: 600 },
+];
+const hours = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+const fmtHour = (h: number) => `${((h + 11) % 12) + 1}${h < 12 ? 'am' : 'pm'}`;
+
+const rates = [
+  { item: 'Pistol lane, 25 m', price: '₱350', unit: 'per hour' },
+  { item: 'Rifle bay, 50 m', price: '₱600', unit: 'per hour' },
+  { item: 'Range gun rental', price: '₱400', unit: 'per hour' },
+  { item: 'Eye and ear protection', price: '₱100', unit: 'per visit' },
+  { item: 'Paper target', price: '₱25', unit: 'each' },
+  { item: 'Range officer coaching', price: '₱500', unit: 'per hour' },
+];
+
+const matches = [
+  { date: 'Sat, Dec 6', title: 'Steel challenge practice', note: 'Open to members and guests' },
+  { date: 'Sun, Dec 14', title: 'First-timer clinic', note: '10 slots, range guns provided' },
+  { date: 'Sat, Dec 20', title: 'Year-end club match', note: 'Registration closes Dec 17' },
+];
+---
+<!doctype html>
+<html lang="en" data-default-brand={brand.name}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{brand.name} | Book a lane in {brand.town}</title>
+    <meta name="description" content={`Book pistol lanes and rifle bays at ${brand.name}, ${brand.town}.`} />
+    <meta name="theme-color" content="#1D2328" />
+  </head>
+  <body>
+    <header class="bar">
+      <a class="logo" href="#top"><span class="logo-mark" aria-hidden="true"></span><span data-brand>{brand.name}</span></a>
+      <nav aria-label="Main">
+        <a href="#book">Book</a>
+        <a href="#rates">Rates</a>
+        <a href="#first-visit">First visit</a>
+        <a href="#visit">Visit</a>
+      </nav>
+      <a class="call" href={`tel:${brand.phone.replace(/\s/g, '')}`}>Call {brand.phone}</a>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <h1>Book a lane before you drive over</h1>
+          <p class="lede">Six covered pistol lanes and two 50-meter rifle bays in {brand.town}. Bring your own firearm or rent one of ours with a range officer beside you.</p>
+          <div class="hero-actions">
+            <a class="btn btn-solid" href="#book">Book a lane</a>
+            <a class="btn btn-line" href="#first-visit">First time here?</a>
+          </div>
+          <dl class="hero-facts">
+            <div><dt>Open today</dt><dd>9 AM to 6 PM</dd></div>
+            <div><dt>Walk-ins</dt><dd>When a lane is free</dd></div>
+            <div><dt>Closed</dt><dd>Mondays</dd></div>
+          </dl>
+        </div>
+
+        <figure class="board" aria-label="Lane status right now">
+          <figcaption>Right now</figcaption>
+          <ul>
+            {lanes.map((l, i) => {
+              const busy = [1, 3, 4, 7].includes(i);
+              return (
+                <li class:list={['board-row', { busy }]}>
+                  <span class="board-num">{l.id}</span>
+                  <span class="board-kind">{l.kind} {l.dist}</span>
+                  <span class="board-state">{busy ? `In use until ${['', '2:00', '', '1:30', '3:00', '', '', '2:30'][i]}` : 'Open'}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </figure>
+      </section>
+
+      <section id="book" class="book">
+        <div class="section-head">
+          <h2>Pick your lane and hours</h2>
+          <p>Tap open boxes to add hours. Grey boxes are already booked. Your request goes to the front desk, and they confirm by text.</p>
+        </div>
+
+        <div class="days" role="group" aria-label="Choose a day" id="days"></div>
+
+        <div class="book-grid">
+          <div class="sheet-wrap">
+            <table class="sheet" id="sheet">
+              <thead>
+                <tr>
+                  <th scope="col"><span class="sr">Lane</span></th>
+                  {hours.map((h) => <th scope="col">{fmtHour(h)}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {lanes.map((l) => (
+                  <tr>
+                    <th scope="row"><span class="lane-n">Lane {l.id}</span><span class="lane-d">{l.kind}, {l.dist}</span></th>
+                    {hours.map((h) => (
+                      <td>
+                        <button type="button" class="slot" data-lane={l.id} data-hour={h} data-rate={l.rate} aria-pressed="false" aria-label={`Lane ${l.id}, ${fmtHour(h)}`}></button>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p class="legend"><span class="key key-open"></span>Open <span class="key key-mine"></span>Your pick <span class="key key-taken"></span>Booked</p>
+          </div>
+
+          <form class="summary" id="summary">
+            <h3>Your booking</h3>
+            <p class="empty" id="empty">No hours picked yet. Choose open boxes on the board.</p>
+            <ul class="picks" id="picks"></ul>
+
+            <fieldset>
+              <legend>Firearm</legend>
+              <label class="radio"><input type="radio" name="gun" value="own" checked /> I'm bringing my own <small>Bring your LTOPF and registration</small></label>
+              <label class="radio"><input type="radio" name="gun" value="rent" /> Rent a range gun <small>₱400 per hour, range officer included</small></label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Add-ons</legend>
+              <label class="check"><input type="checkbox" name="ear" /> Eye and ear protection, ₱100</label>
+              <label class="qty">Paper targets, ₱25 each <input type="number" name="targets" min="0" max="50" value="2" inputmode="numeric" /></label>
+              <label class="check"><input type="checkbox" name="coach" /> Coaching, ₱500 per hour</label>
+            </fieldset>
+
+            <div class="fields">
+              <label>Name <input name="who" required autocomplete="name" /></label>
+              <label>Mobile number <input name="tel" required inputmode="tel" autocomplete="tel" placeholder="09xx xxx xxxx" /></label>
+            </div>
+
+            <p class="total"><span>Estimated total</span><strong id="total">₱0</strong></p>
+            <p class="small">Ammunition is sold at the counter. Prices vary by caliber.</p>
+            <button class="btn btn-solid wide" type="submit">Send booking request</button>
+            <div class="sent" id="sent" hidden>
+              <p><strong>Request ready.</strong> Send it by text or Messenger and the front desk will confirm your lane.</p>
+              <div class="sent-actions">
+                <a class="btn btn-solid" id="sms">Send by text</a>
+                <a class="btn btn-line" href={brand.messenger} id="msgr">Open Messenger</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="rates" class="rates">
+        <div class="section-head">
+          <h2>Rates</h2>
+          <p>Prices include range fees and use of the lane's target carrier.</p>
+        </div>
+        <ul class="rate-board">
+          {rates.map((r) => (
+            <li><span class="r-item">{r.item}</span><span class="r-price">{r.price}</span><span class="r-unit">{r.unit}</span></li>
+          ))}
+        </ul>
+        <div class="members">
+          <div>
+            <h3>Monthly member</h3>
+            <p class="m-price">₱2,500 <span>a month</span></p>
+            <p>Eight lane hours, priority booking and 10% off range gun rental.</p>
+          </div>
+          <div>
+            <h3>Annual member</h3>
+            <p class="m-price">₱24,000 <span>a year</span></p>
+            <p>Unlimited weekday lane hours, free club matches and a locker.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="first-visit" class="first">
+        <div class="section-head">
+          <h2>Your first visit</h2>
+          <p>Plan for 20 extra minutes. Every new shooter goes through the same four steps.</p>
+        </div>
+        <ol class="steps">
+          <li><h3>Check in</h3><p>Show a valid ID. If you bring your own firearm, bring your LTOPF and its registration.</p></li>
+          <li><h3>Sign the waiver</h3><p>One page. Guests under 18 need a parent or guardian on site.</p></li>
+          <li><h3>Safety briefing</h3><p>A range officer covers the commands, the safe direction and how to call a cease fire.</p></li>
+          <li><h3>Shoot</h3><p>First-timers shoot with a range officer at their lane for the whole session.</p></li>
+        </ol>
+        <div class="rules">
+          <h3>Range rules</h3>
+          <ul>
+            <li>Firearms stay cased until you are at your lane.</li>
+            <li>Muzzle pointed downrange at all times.</li>
+            <li>Finger off the trigger until you are on target.</li>
+            <li>Eye and ear protection on the firing line.</li>
+            <li>Stop at once when anyone calls cease fire.</li>
+            <li>No alcohol on the premises.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="matches">
+        <div class="section-head">
+          <h2>Coming up</h2>
+        </div>
+        <ul class="match-list">
+          {matches.map((m) => (
+            <li><span class="m-date">{m.date}</span><span class="m-title">{m.title}</span><span class="m-note">{m.note}</span></li>
+          ))}
+        </ul>
+      </section>
+
+      <section id="visit" class="visit">
+        <div>
+          <h2>Find us</h2>
+          <address>
+            <span data-brand>{brand.name}</span><br />
+            Your street address<br />
+            {brand.town}
+          </address>
+          <table class="hours">
+            <tbody>
+              <tr><th scope="row">Tuesday to Friday</th><td>10 AM to 6 PM</td></tr>
+              <tr><th scope="row">Saturday and Sunday</th><td>9 AM to 6 PM</td></tr>
+              <tr><th scope="row">Monday</th><td>Closed</td></tr>
+            </tbody>
+          </table>
+          <p><a href={`tel:${brand.phone.replace(/\s/g, '')}`}>{brand.phone}</a></p>
+        </div>
+        <div class="map" role="img" aria-label="Map placeholder">Google Map goes here</div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p><span data-brand>{brand.name}</span>, {brand.town}. Licensed range operator.</p>
+    </footer>
+
+    <DemoBadge />
+
+    <script>
+      const peso = (n: number) => '₱' + n.toLocaleString('en-PH');
+      const slots = [...document.querySelectorAll<HTMLButtonElement>('.slot')];
+      const daysEl = document.getElementById('days')!;
+      const picksEl = document.getElementById('picks')!;
+      const emptyEl = document.getElementById('empty')!;
+      const totalEl = document.getElementById('total')!;
+      const form = document.getElementById('summary') as HTMLFormElement;
+      const sent = document.getElementById('sent')!;
+      const fmtHour = (h: number) => `${((h + 11) % 12) + 1}${h < 12 ? 'am' : 'pm'}`;
+
+      // Sample bookings: a stable pattern per date so the board looks lived-in.
+      const taken = (key: string) => {
+        let h = 0;
+        for (const c of key) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+        return h % 100 < 28;
+      };
+
+      const today = new Date();
+      const days = Array.from({ length: 7 }, (_, i) => new Date(today.getFullYear(), today.getMonth(), today.getDate() + i))
+        .filter((d) => d.getDay() !== 1);
+      let day = days[0];
+
+      days.forEach((d, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'day';
+        b.setAttribute('aria-pressed', String(i === 0));
+        b.innerHTML = `<span>${i === 0 ? 'Today' : d.toLocaleDateString('en-PH', { weekday: 'short' })}</span><strong>${d.getDate()}</strong>`;
+        b.addEventListener('click', () => {
+          daysEl.querySelectorAll('.day').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+          b.setAttribute('aria-pressed', 'true');
+          day = d;
+          paint();
+        });
+        daysEl.append(b);
+      });
+
+      function paint() {
+        const key = day.toDateString();
+        slots.forEach((s) => {
+          const isTaken = taken(key + s.dataset.lane + s.dataset.hour);
+          s.disabled = isTaken;
+          s.classList.toggle('taken', isTaken);
+          s.setAttribute('aria-pressed', 'false');
+          s.setAttribute('aria-label', `Lane ${s.dataset.lane}, ${fmtHour(Number(s.dataset.hour))}, ${isTaken ? 'booked' : 'open'}`);
+        });
+        update();
+      }
+
+      function update() {
+        const mine = slots.filter((s) => s.getAttribute('aria-pressed') === 'true');
+        const byLane = new Map<string, number[]>();
+        mine.forEach((s) => byLane.set(s.dataset.lane!, [...(byLane.get(s.dataset.lane!) ?? []), Number(s.dataset.hour)]));
+        picksEl.innerHTML = '';
+        byLane.forEach((hrs, lane) => {
+          const li = document.createElement('li');
+          li.textContent = `Lane ${lane}: ${hrs.map(fmtHour).join(', ')} (${hrs.length} hr)`;
+          picksEl.append(li);
+        });
+        emptyEl.hidden = mine.length > 0;
+
+        const data = new FormData(form);
+        const laneCost = mine.reduce((sum, s) => sum + Number(s.dataset.rate), 0);
+        const hoursCount = mine.length;
+        let total = laneCost;
+        if (data.get('gun') === 'rent') total += 400 * hoursCount;
+        if (data.get('ear')) total += 100;
+        if (data.get('coach')) total += 500 * hoursCount;
+        total += 25 * Math.max(0, Number(data.get('targets')) || 0);
+        totalEl.textContent = peso(hoursCount ? total : 0);
+        sent.hidden = true;
+        return { byLane, total, hoursCount };
+      }
+
+      slots.forEach((s) =>
+        s.addEventListener('click', () => {
+          s.setAttribute('aria-pressed', String(s.getAttribute('aria-pressed') !== 'true'));
+          update();
+        })
+      );
+      form.addEventListener('input', update);
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const { byLane, total, hoursCount } = update();
+        if (!hoursCount) {
+          emptyEl.hidden = false;
+          emptyEl.textContent = 'Pick at least one open hour on the board first.';
+          emptyEl.classList.add('warn');
+          return;
+        }
+        const data = new FormData(form);
+        const lines = [...byLane].map(([lane, hrs]) => `Lane ${lane}: ${hrs.map(fmtHour).join(', ')}`);
+        const msg = `Booking request for ${day.toDateString()}\n${lines.join('\n')}\nFirearm: ${data.get('gun') === 'rent' ? 'range gun' : 'my own'}\nName: ${data.get('who')}\nMobile: ${data.get('tel')}\nEstimate: ${peso(total)}`;
+        (document.getElementById('sms') as HTMLAnchorElement).href = `sms:?&body=${encodeURIComponent(msg)}`;
+        sent.hidden = false;
+        sent.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      });
+
+      paint();
+    </script>
+
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      :root {
+        --concrete: #ecebe6;
+        --ink: #1d2328;
+        --orange: #e8571b;
+        --berm: #3e5a3a;
+        --white: #ffffff;
+        --line: #c8cac3;
+        --soft: #5b625f;
+        --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+        --text: 'Barlow', system-ui, sans-serif;
+      }
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      body { margin: 0; background: var(--concrete); color: var(--ink); font: 400 1.0625rem/1.55 var(--text); }
+      h1, h2, h3 { font-family: var(--display); font-weight: 800; line-height: 0.95; margin: 0; letter-spacing: -0.01em; }
+      a { color: inherit; }
+      :focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+      .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    </style>
+
+    <style>
+      .bar {
+        position: sticky; top: 0; z-index: 20;
+        display: flex; align-items: center; gap: 1.5rem;
+        padding: 0.8rem clamp(1rem, 4vw, 3rem);
+        background: var(--ink); color: var(--white);
+      }
+      .logo { display: flex; align-items: center; gap: 0.6rem; font: 800 1.35rem/1 var(--display); text-decoration: none; }
+      .logo-mark { width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle, var(--orange) 0 22%, transparent 23% 42%, var(--white) 43% 52%, transparent 53% 70%, var(--white) 71%); }
+      nav { display: flex; gap: 1.25rem; margin-left: auto; }
+      nav a { text-decoration: none; font-weight: 500; opacity: 0.85; }
+      nav a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+      .call { background: var(--orange); padding: 0.5rem 0.9rem; font-weight: 600; text-decoration: none; border-radius: 4px; white-space: nowrap; }
+
+      section { padding: clamp(3rem, 7vw, 5.5rem) clamp(1rem, 4vw, 3rem); }
+      .section-head { max-width: 46rem; margin-bottom: 2rem; }
+      .section-head h2 { font-size: clamp(2.4rem, 5vw, 3.6rem); }
+      .section-head p { color: var(--soft); margin: 0.75rem 0 0; max-width: 60ch; }
+
+      .hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+      .hero h1 { font-size: clamp(3.2rem, 8.5vw, 6.6rem); max-width: 9ch; text-transform: none; }
+      .lede { font-size: 1.2rem; max-width: 42ch; margin: 1.5rem 0 2rem; }
+      .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+      .hero-facts { display: flex; gap: 2rem; flex-wrap: wrap; margin: 2.5rem 0 0; padding-top: 1.25rem; border-top: 2px solid var(--ink); }
+      .hero-facts dt { font-size: 0.9rem; color: var(--soft); }
+      .hero-facts dd { margin: 0; font: 600 1.35rem/1.2 var(--display); }
+
+      .btn { display: inline-block; padding: 0.85rem 1.4rem; font: 600 1.05rem/1 var(--text); border-radius: 4px; text-decoration: none; cursor: pointer; border: 2px solid var(--ink); }
+      .btn-solid { background: var(--orange); border-color: var(--orange); color: var(--white); }
+      .btn-solid:hover { background: #cf4710; border-color: #cf4710; }
+      .btn-line { background: transparent; color: var(--ink); }
+      .btn-line:hover { background: var(--ink); color: var(--white); }
+      .wide { width: 100%; }
+
+      .board { margin: 0; background: var(--berm); color: var(--white); padding: 1.25rem; border-radius: 6px; box-shadow: 0 18px 40px -20px rgba(29, 35, 40, 0.55); }
+      .board figcaption { font: 600 1.1rem/1 var(--display); margin-bottom: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+      .board figcaption::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: #8fe07a; box-shadow: 0 0 0 4px rgba(143, 224, 122, 0.25); }
+      .board ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+      .board-row { display: grid; grid-template-columns: 3rem 1fr auto; align-items: center; gap: 0.75rem; background: rgba(255, 255, 255, 0.08); padding: 0.5rem 0.75rem; border-radius: 4px; }
+      .board-num { font: 800 1.9rem/1 var(--display); }
+      .board-kind { font-size: 0.95rem; opacity: 0.85; }
+      .board-state { font: 600 1.05rem/1 var(--display); background: var(--white); color: var(--berm); padding: 0.3rem 0.6rem; border-radius: 3px; }
+      .busy .board-state { background: transparent; color: #f0c9b8; box-shadow: inset 0 0 0 1px rgba(255,255,255,.3); }
+
+      .book { background: var(--white); }
+      .days { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 1.25rem; }
+      .days :global(.day) { flex: 0 0 auto; display: grid; justify-items: center; gap: 0.1rem; min-width: 4.5rem; padding: 0.55rem 0.8rem; border: 2px solid var(--line); background: var(--white); border-radius: 4px; font: inherit; cursor: pointer; }
+      .days :global(.day span) { font-size: 0.85rem; color: var(--soft); }
+      .days :global(.day strong) { font: 800 1.6rem/1 var(--display); }
+      .days :global(.day[aria-pressed='true']) { border-color: var(--ink); background: var(--ink); color: var(--white); }
+      .days :global(.day[aria-pressed='true'] span) { color: #c7ccd0; }
+
+      .book-grid { display: grid; grid-template-columns: minmax(0, 1fr) 22rem; gap: 2rem; align-items: start; }
+      .sheet-wrap { overflow-x: auto; }
+      .sheet { border-collapse: separate; border-spacing: 4px; min-width: 40rem; }
+      .sheet thead th { font: 600 1rem/1 var(--display); color: var(--soft); padding-bottom: 0.25rem; }
+      .sheet tbody th { text-align: left; padding-right: 0.75rem; white-space: nowrap; }
+      .lane-n { display: block; font: 800 1.25rem/1 var(--display); }
+      .lane-d { font-size: 0.82rem; color: var(--soft); }
+      .slot { width: 100%; min-width: 3rem; height: 2.6rem; border: 2px solid var(--line); background: var(--white); border-radius: 3px; cursor: pointer; }
+      .slot:hover:not(:disabled) { border-color: var(--ink); }
+      .slot[aria-pressed='true'] { background: var(--orange); border-color: var(--orange); }
+      .slot.taken { cursor: not-allowed; border-color: transparent; background: repeating-linear-gradient(135deg, #d9dad5 0 6px, #e7e8e3 6px 12px); }
+      .legend { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; color: var(--soft); font-size: 0.9rem; }
+      .key { display: inline-block; width: 16px; height: 16px; border-radius: 2px; margin-left: 0.75rem; }
+      .key:first-child { margin-left: 0; }
+      .key-open { border: 2px solid var(--line); }
+      .key-mine { background: var(--orange); }
+      .key-taken { background: repeating-linear-gradient(135deg, #d9dad5 0 3px, #e7e8e3 3px 6px); }
+
+      .summary { position: sticky; top: 5rem; background: var(--concrete); padding: 1.5rem; border-radius: 6px; border-top: 6px solid var(--orange); }
+      .summary h3 { font-size: 1.9rem; margin-bottom: 0.75rem; }
+      .empty { color: var(--soft); margin: 0 0 1rem; }
+      .empty.warn { color: #b23a0c; font-weight: 600; }
+      .picks { margin: 0 0 1rem; padding-left: 1.1rem; font-weight: 500; }
+      fieldset { border: 0; padding: 0; margin: 0 0 1.1rem; display: grid; gap: 0.5rem; }
+      legend { font: 600 1.15rem/1 var(--display); margin-bottom: 0.5rem; }
+      .radio, .check { display: grid; grid-template-columns: auto 1fr; gap: 0 0.5rem; align-items: start; }
+      .radio small { grid-column: 2; color: var(--soft); font-size: 0.85rem; }
+      .qty { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+      .qty input { width: 4.5rem; }
+      input[type='radio'], input[type='checkbox'] { accent-color: var(--orange); margin-top: 0.3rem; }
+      .fields { display: grid; gap: 0.6rem; margin-bottom: 1rem; }
+      .fields label { display: grid; gap: 0.25rem; font-weight: 500; font-size: 0.95rem; }
+      input:not([type='radio']):not([type='checkbox']) { font: inherit; padding: 0.55rem 0.7rem; border: 2px solid var(--line); border-radius: 4px; background: var(--white); }
+      .total { display: flex; justify-content: space-between; align-items: baseline; border-top: 2px solid var(--ink); padding-top: 0.75rem; margin: 0; }
+      .total strong { font: 800 2.2rem/1 var(--display); }
+      .small { font-size: 0.85rem; color: var(--soft); }
+      .sent { margin-top: 1rem; padding: 1rem; background: var(--white); border-left: 4px solid var(--berm); }
+      .sent p { margin: 0 0 0.75rem; }
+      .sent-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+      .rate-board { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 3rem; max-width: 64rem; }
+      .rate-board li { display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; padding: 1rem 0; border-bottom: 2px solid var(--line); }
+      .r-item { font-weight: 600; font-size: 1.1rem; }
+      .r-price { grid-row: span 2; font: 800 2.4rem/1 var(--display); color: var(--ink); }
+      .r-unit { color: var(--soft); font-size: 0.9rem; }
+      .members { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; max-width: 64rem; margin-top: 2.5rem; }
+      .members > div { background: var(--ink); color: var(--white); padding: 1.5rem; border-radius: 6px; }
+      .members > div:last-child { background: var(--berm); }
+      .members h3 { font-size: 1.6rem; }
+      .m-price { font: 800 2.8rem/1 var(--display); margin: 0.75rem 0 0.5rem; }
+      .m-price span { font: 500 1rem var(--text); opacity: 0.75; }
+      .members p:last-child { margin: 0; opacity: 0.9; }
+
+      .first { background: var(--ink); color: var(--white); }
+      .first .section-head p { color: #b9c0c4; }
+      .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; counter-reset: step; }
+      .steps li { counter-increment: step; border-top: 3px solid var(--orange); padding-top: 1rem; }
+      .steps li::before { content: counter(step); display: block; font: 800 3.4rem/1 var(--display); color: var(--orange); margin-bottom: 0.5rem; }
+      .steps h3 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+      .steps p { margin: 0; color: #cfd4d7; }
+      .rules { margin-top: 3rem; max-width: 52rem; }
+      .rules h3 { font-size: 1.8rem; margin-bottom: 1rem; }
+      .rules ul { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: 2.5rem; }
+      .rules li { break-inside: avoid; padding: 0.5rem 0 0.5rem 1.5rem; position: relative; }
+      .rules li::before { content: ''; position: absolute; left: 0; top: 0.95rem; width: 10px; height: 10px; background: var(--orange); }
+
+      .match-list { list-style: none; margin: 0; padding: 0; max-width: 56rem; }
+      .match-list li { display: grid; grid-template-columns: 9rem 1fr; gap: 0 1.5rem; padding: 1rem 0; border-bottom: 2px solid var(--line); }
+      .m-date { grid-row: span 2; font: 800 1.5rem/1.1 var(--display); color: var(--orange); }
+      .m-title { font-weight: 600; font-size: 1.15rem; }
+      .m-note { color: var(--soft); }
+
+      .visit { display: grid; grid-template-columns: 1fr 1.2fr; gap: 2.5rem; background: var(--white); }
+      .visit h2 { font-size: clamp(2.4rem, 5vw, 3.6rem); margin-bottom: 1rem; }
+      address { font-style: normal; font-size: 1.15rem; margin-bottom: 1.25rem; }
+      .hours { border-collapse: collapse; margin-bottom: 1rem; }
+      .hours th { text-align: left; font-weight: 500; padding: 0.35rem 1.5rem 0.35rem 0; }
+      .hours td { font-weight: 600; }
+      .map { min-height: 18rem; display: grid; place-items: center; color: var(--soft); border-radius: 6px; background: repeating-linear-gradient(0deg, transparent 0 39px, #dcdcd6 39px 40px), repeating-linear-gradient(90deg, transparent 0 39px, #dcdcd6 39px 40px), var(--concrete); }
+
+      .foot { padding: 2rem clamp(1rem, 4vw, 3rem) 4.5rem; background: var(--ink); color: #b9c0c4; font-size: 0.95rem; }
+      .foot p { margin: 0; }
+
+      @media (max-width: 960px) {
+        .hero, .book-grid, .visit { grid-template-columns: 1fr; }
+        .summary { position: static; }
+        .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 640px) {
+        nav { display: none; }
+        .call { margin-left: auto; }
+        .rate-board, .members { grid-template-columns: 1fr; }
+        .rules ul { columns: 1; }
+        .steps { grid-template-columns: 1fr; }
+        .match-list li { grid-template-columns: 1fr; }
+        .m-date { grid-row: auto; }
+      }
+    </style>
+  </body>
+</html>

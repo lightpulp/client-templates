@@ -1,11 +1,143 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import '@fontsource-variable/hanken-grotesk';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const designs = [
+  { slug: 'range', name: 'Lane Booking', bestFor: 'Shooting ranges, courts, studios, anything booked by the hour', core: 'Customers pick lanes and hours on a live board, and the price adds up as they choose.', colors: ['#EDEDEA', '#1D2328', '#E8571B', '#3E5A3A'] },
+  { slug: 'armory', name: 'Inventory Catalog', bestFor: 'Gun stores and shops with a large, changing stock', core: 'Filter by type, caliber, brand and stock. Every item gets its own page, and customers build an inquiry list.', colors: ['#2D3940', '#CBAA72', '#E7E9E4', '#D0533A'] },
+  { slug: 'frontier', name: 'Counter & Services', bestFor: 'Established gun stores that sell on trust and service', core: 'A license-help tracker, a gunsmith price board and seminar seat reservations.', colors: ['#F1ECE2', '#7B2216', '#A9822F', '#2F4454'] },
+  { slug: 'leather', name: 'Custom Order Builder', bestFor: 'Leathercraft, holster makers, made-to-order goods', core: 'Choose the item, leather, thread and initials. The preview and price update as you go.', colors: ['#1E3A31', '#9A4F25', '#D8B48C', '#EFE6D6'] },
+  { slug: 'vault', name: 'Spec & Compare', bestFor: 'Safes, manufacturers and suppliers that sell on specifications', core: 'A safe finder recommends a model, a sortable spec table compares the line, and a delivery estimate closes the deal.', colors: ['#EEF0F2', '#1F5466', '#D99A00', '#262D33'] },
+  { slug: 'hotel', name: 'Stay Planner', bestFor: 'Hotels, resorts, inns and event venues', core: 'Dates and guests turn into room prices for the whole stay, with taxes and fees shown before anyone asks.', colors: ['#FBFBF9', '#24614F', '#D8C7A3', '#4A2E1C'] },
+  { slug: 'garage', name: 'Service Bay Booking', bestFor: 'Auto shops, detailing, custom builds', core: 'A before-and-after build slider, a service menu with starting prices, and booking with a time estimate.', colors: ['#FFC72C', '#1C1F22', '#A7ABB0', '#F7F7F5'] },
+  { slug: 'ebike', name: 'Online Store', bestFor: 'E-bikes, gadgets and any shop that ships or does pickup', core: 'A real cart and checkout with COD or GCash, plus range and installment calculators.', colors: ['#EAF3FB', '#13233F', '#F6B100', '#2E8B57'] },
+  { slug: 'watch', name: 'Boutique Collection', bestFor: 'Watches, jewelry and other high-value pieces', core: 'A collection with quick view, a wishlist and viewing appointments, so buyers see a piece before they pay.', colors: ['#14213D', '#D8BC84', '#F3EFE6', '#A9B3C4'] },
+];
 ---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Website directions | Lightpulp Studio</title>
+    <meta name="description" content="Nine website directions by Lightpulp Studio." />
+  </head>
+  <body>
+    <header class="top">
+      <p class="studio">Lightpulp Studio</p>
+      <h1>Nine ways your website could work</h1>
+      <p class="intro">Each design is built around a different job: booking, selling, quoting, or earning trust. Type your business name and every design will show it.</p>
+      <label class="name-field">
+        <span>Your business name</span>
+        <input id="biz" type="text" autocomplete="organization" placeholder="e.g. Final Option" />
+      </label>
+    </header>
 
-<Layout>
-	<Welcome />
-</Layout>
+    <main>
+      <ul class="designs">
+        {designs.map((d) => (
+          <li class="design">
+            <a class="design-link" href={`/${d.slug}`} data-design>
+              <span class="chips" aria-hidden="true">
+                {d.colors.map((c) => <span style={`background:${c}`}></span>)}
+              </span>
+              <span class="design-body">
+                <span class="design-name">{d.name}</span>
+                <span class="design-core">{d.core}</span>
+                <span class="design-for">Best for {d.bestFor.charAt(0).toLowerCase() + d.bestFor.slice(1)}</span>
+              </span>
+              <span class="open">Open</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </main>
+
+    <footer class="foot">
+      <p>Designs are samples with placeholder text, prices and photos. Your site gets your real content, photos and contact details.</p>
+    </footer>
+
+    <script>
+      const input = document.getElementById('biz') as HTMLInputElement;
+      const links = document.querySelectorAll<HTMLAnchorElement>('[data-design]');
+      const saved = sessionStorage.getItem('lp-name') ?? '';
+      input.value = saved;
+      const apply = () => {
+        const name = input.value.trim();
+        sessionStorage.setItem('lp-name', name);
+        links.forEach((a) => {
+          const url = new URL(a.href);
+          if (name) url.searchParams.set('name', name);
+          else url.searchParams.delete('name');
+          a.href = url.pathname + url.search;
+        });
+      };
+      input.addEventListener('input', apply);
+      apply();
+    </script>
+
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #f7f7f4;
+        color: #1f2430;
+        font-family: 'Hanken Grotesk Variable', system-ui, sans-serif;
+        font-size: 1.0625rem;
+        line-height: 1.55;
+      }
+      :focus-visible { outline: 2px solid #1f2430; outline-offset: 3px; }
+    </style>
+
+    <style>
+      .top, main, .foot { width: min(100% - 2.5rem, 62rem); margin-inline: auto; }
+      .top { padding: clamp(2.5rem, 7vw, 5rem) 0 2rem; }
+      .studio { margin: 0 0 1.5rem; font-weight: 700; letter-spacing: -0.01em; }
+      h1 {
+        margin: 0;
+        font-size: clamp(2.2rem, 6vw, 4rem);
+        line-height: 1.02;
+        letter-spacing: -0.035em;
+        font-weight: 800;
+        max-width: 14ch;
+      }
+      .intro { max-width: 52ch; color: #4b5262; margin: 1.25rem 0 2rem; }
+      .name-field { display: grid; gap: 0.4rem; max-width: 26rem; font-weight: 600; font-size: 0.95rem; }
+      .name-field input {
+        font: inherit;
+        font-weight: 500;
+        font-size: 1.1rem;
+        padding: 0.8rem 1rem;
+        border: 2px solid #1f2430;
+        border-radius: 10px;
+        background: #fff;
+      }
+
+      .designs { list-style: none; margin: 1rem 0 0; padding: 0; border-top: 2px solid #1f2430; }
+      .design { border-bottom: 1px solid #d9dad3; }
+      .design-link {
+        display: grid;
+        grid-template-columns: 5.5rem 1fr auto;
+        gap: 1.25rem;
+        align-items: center;
+        padding: 1.25rem 0.25rem;
+        color: inherit;
+        text-decoration: none;
+      }
+      .design-link:hover .open { background: #1f2430; color: #fff; }
+      .chips { display: grid; grid-template-columns: repeat(4, 1fr); height: 3.25rem; border-radius: 8px; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+      .design-body { display: grid; gap: 0.2rem; }
+      .design-name { font-size: 1.35rem; font-weight: 750; letter-spacing: -0.02em; }
+      .design-core { max-width: 60ch; }
+      .design-for { color: #6a7080; font-size: 0.95rem; }
+      .open { border: 1.5px solid #1f2430; border-radius: 999px; padding: 0.35rem 0.9rem; font-weight: 650; font-size: 0.95rem; transition: background .15s, color .15s; }
+
+      .foot { padding: 2.5rem 0 4rem; color: #6a7080; font-size: 0.95rem; }
+
+      @media (max-width: 560px) {
+        .design-link { grid-template-columns: 1fr; gap: 0.75rem; }
+        .chips { height: 1.6rem; width: 8rem; }
+        .open { justify-self: start; }
+      }
+    </style>
+  </body>
+</html>

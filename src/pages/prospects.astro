@@ -1,0 +1,72 @@
+---
+// Private shortcut list for the show. Not linked from the public hub.
+import '@fontsource-variable/hanken-grotesk';
+
+const prospects = [
+  { name: 'Bacolor Shooting Range', industry: 'Shooting range', design: 'range', alt: 'frontier' },
+  { name: 'Baculud Megadike Shooting Range', industry: 'Shooting range', design: 'range', alt: 'garage' },
+  { name: 'Final Option', industry: 'Gun store', design: 'armory', alt: 'frontier' },
+  { name: 'Force Site', industry: 'Gun store', design: 'armory', alt: 'frontier' },
+  { name: 'Magnus', industry: 'Gun store', design: 'frontier', alt: 'armory' },
+  { name: 'Imperial GAA Guns', industry: 'Gun store', design: 'frontier', alt: 'armory' },
+  { name: 'Jordan Leather', industry: 'Leather / holsters', design: 'leather', alt: 'armory' },
+  { name: 'Lordman Leathercraft', industry: 'Leather / holsters', design: 'leather', alt: 'watch' },
+  { name: 'Gemsafe SafetyVaults', industry: 'Safes', design: 'vault', alt: 'armory' },
+  { name: 'Santiago Fiberforce', industry: 'Gun (confirm products)', design: 'vault', alt: 'leather' },
+  { name: "Raj's Military Supply", industry: 'Gun / military supply', design: 'armory', alt: 'ebike' },
+  { name: 'trueweight inc', industry: 'Gun (confirm products)', design: 'vault', alt: 'armory' },
+  { name: 'Tactical Precision Trading', industry: 'Gun store', design: 'armory', alt: 'vault' },
+  { name: 'Wrist Pod', industry: 'Watches', design: 'watch', alt: 'ebike' },
+  { name: 'Kuda Ebikes', industry: 'E-bikes', design: 'ebike', alt: 'garage' },
+  { name: 'Maganda Hotel', industry: 'Hotel', design: 'hotel', alt: 'range' },
+  { name: 'Project Arsenal', industry: 'Auto shop', design: 'garage', alt: 'ebike' },
+  { name: 'Frontier Gun Store', industry: 'Gun store', design: 'frontier', alt: 'armory' },
+];
+const link = (slug: string, name: string) => `/${slug}?name=${encodeURIComponent(name)}`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Prospects | Lightpulp Studio</title>
+  </head>
+  <body>
+    <main>
+      <h1>Show prospects</h1>
+      <p>Tap a business to open its main design with its name already in place. The second link is a backup direction.</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th scope="col">Business</th><th scope="col">Industry</th><th scope="col">Main design</th><th scope="col">Backup</th></tr></thead>
+          <tbody>
+            {prospects.map((p) => (
+              <tr>
+                <th scope="row"><a href={link(p.design, p.name)}>{p.name}</a></th>
+                <td>{p.industry}</td>
+                <td><a href={link(p.design, p.name)}>{p.design}</a></td>
+                <td><a href={link(p.alt, p.name)}>{p.alt}</a></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </main>
+    <style is:global>
+      body { margin: 0; background: #f7f7f4; color: #1f2430; font: 400 1rem/1.5 'Hanken Grotesk Variable', system-ui, sans-serif; }
+      :focus-visible { outline: 2px solid #1f2430; outline-offset: 2px; }
+    </style>
+    <style>
+      main { width: min(100% - 2rem, 60rem); margin: 0 auto; padding: 2.5rem 0 4rem; }
+      h1 { font-size: 2rem; letter-spacing: -0.03em; margin: 0 0 0.5rem; }
+      p { color: #4b5262; max-width: 56ch; }
+      .scroll { overflow-x: auto; }
+      table { width: 100%; border-collapse: collapse; min-width: 34rem; }
+      th, td { text-align: left; padding: 0.75rem 0.5rem; border-bottom: 1px solid #d9dad3; }
+      thead th { border-bottom: 2px solid #1f2430; font-size: 0.9rem; }
+      tbody th { font-weight: 650; }
+      a { color: inherit; text-underline-offset: 3px; }
+      td a { color: #4b5262; }
+    </style>
+  </body>
+</html>

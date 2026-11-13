@@ -1,0 +1,564 @@
+---
+import '@fontsource-variable/lexend';
+import DemoBadge from '../components/DemoBadge.astro';
+
+const brand = { name: 'Kabayo E-Bikes', town: 'City of San Fernando, Pampanga', phone: '0917 000 0000', messenger: 'https://m.me/yourpage' };
+
+const colors = [
+  { id: 'sun', label: 'Sunrise yellow', hex: '#F6B100' },
+  { id: 'ocean', label: 'Ocean blue', hex: '#2457F5' },
+  { id: 'mint', label: 'Mint', hex: '#3DBE9B' },
+  { id: 'coral', label: 'Coral', hex: '#F2665C' },
+  { id: 'graphite', label: 'Graphite', hex: '#3A4150' },
+];
+const models = [
+  { id: 'city', name: 'City 2', price: 38900, range: 60, speed: 25, motor: '350 W', weight: '24 kg', color: '#F6B100', note: 'Step-through frame for daily commutes and errands.' },
+  { id: 'fold', name: 'Fold', price: 32500, range: 45, speed: 25, motor: '250 W', weight: '19 kg', color: '#3DBE9B', note: 'Folds in 10 seconds to fit a car trunk or a condo closet.' },
+  { id: 'cargo', name: 'Cargo', price: 54900, range: 70, speed: 25, motor: '500 W', weight: '32 kg', color: '#2457F5', note: 'Long rear rack rated for 80 kg. Made for deliveries and school runs.' },
+  { id: 'trike', name: 'Trike', price: 68000, range: 55, speed: 20, motor: '500 W', weight: '48 kg', color: '#F2665C', note: 'Three wheels and a big basket. Stable for older riders.' },
+];
+const batteries = [
+  { ah: 10, label: '10 Ah', add: 0, km: 40 },
+  { ah: 15, label: '15 Ah', add: 6500, km: 60 },
+  { ah: 20, label: '20 Ah', add: 11000, km: 80 },
+];
+const peso = (n: number) => '₱' + n.toLocaleString('en-PH');
+
+const bike = (fill: string, id = '') => `
+  <g class="wheel"><circle cx="95" cy="185" r="60"/><circle class="rim" cx="95" cy="185" r="50"/>${[0, 30, 60, 90, 120, 150].map((a) => `<line class="spoke" x1="${95 + Math.cos(a * Math.PI / 180) * 50}" y1="${185 + Math.sin(a * Math.PI / 180) * 50}" x2="${95 - Math.cos(a * Math.PI / 180) * 50}" y2="${185 - Math.sin(a * Math.PI / 180) * 50}"/>`).join('')}</g>
+  <g class="wheel"><circle cx="305" cy="185" r="60"/><circle class="rim" cx="305" cy="185" r="50"/>${[0, 30, 60, 90, 120, 150].map((a) => `<line class="spoke" x1="${305 + Math.cos(a * Math.PI / 180) * 50}" y1="${185 + Math.sin(a * Math.PI / 180) * 50}" x2="${305 - Math.cos(a * Math.PI / 180) * 50}" y2="${185 - Math.sin(a * Math.PI / 180) * 50}"/>`).join('')}</g>
+  <path class="dark" d="M58 122H150M72 122L95 185" stroke-width="5"/>
+  <g ${id ? `id="${id}"` : ''} class="frame" stroke="${fill}">
+    <path d="M95 185L190 192M95 185L158 106M190 192L162 100M190 192Q214 140 272 100"/>
+  </g>
+  <path class="dark" d="M206 164Q222 134 254 111" stroke-width="18"/>
+  <circle cx="236" cy="128" r="3.5" fill="#F6B100"/>
+  <path class="dark" d="M272 100L305 185M272 100L264 70M246 66L286 61" stroke-width="8"/>
+  <path class="dark" d="M140 92H180" stroke-width="10"/>
+  <circle cx="95" cy="185" r="16" fill="#13233F"/>
+  <circle cx="190" cy="192" r="9" fill="#13233F"/>
+  <circle cx="283" cy="92" r="5" fill="#F6B100"/>
+`;
+---
+<!doctype html>
+<html lang="en" data-default-brand={brand.name}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{brand.name} | E-bikes delivered in Pampanga</title>
+    <meta name="description" content={`Shop e-bikes online at ${brand.name}. Pay by COD or GCash, with installments and free pickup in ${brand.town}.`} />
+    <meta name="theme-color" content="#13233F" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="logo" href="#top"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="16" r="4.5" /><circle cx="18" cy="16" r="4.5" /><path d="M6 16l5-7h5l2 7M11 9l3 7" /></svg><span data-brand>{brand.name}</span></a>
+      <nav aria-label="Main">
+        <a href="#bikes">Bikes</a>
+        <a href="#range">Range</a>
+        <a href="#pay">Installments</a>
+        <a href="#service">Service</a>
+      </nav>
+      <button class="cart-btn" type="button" id="open-cart" aria-haspopup="dialog">Cart <span id="cart-count">0</span></button>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="stage">
+          <div class="sun" aria-hidden="true"></div>
+          <svg viewBox="0 0 400 260" role="img" aria-label="City 2 e-bike in the color you picked" class="bike-big" set:html={bike(colors[0].hex, 'hero-frame')} />
+        </div>
+        <form class="buy" id="buy">
+          <p class="model-line">City 2, our best seller</p>
+          <h1>Skip the traffic. Ride to work for about ₱5 a day.</h1>
+          <fieldset>
+            <legend>Color <span id="color-name">{colors[0].label}</span></legend>
+            <div class="dots">
+              {colors.map((c, i) => (
+                <label><input type="radio" name="color" value={c.label} data-hex={c.hex} checked={i === 0} /><span style={`--c:${c.hex}`}></span><span class="sr">{c.label}</span></label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Battery</legend>
+            <div class="batts">
+              {batteries.map((b, i) => (
+                <label><input type="radio" name="batt" value={b.label} data-add={b.add} checked={i === 1} /><span><strong>{b.label}</strong><small>Up to {b.km} km{b.add ? `, +${peso(b.add)}` : ''}</small></span></label>
+              ))}
+            </div>
+          </fieldset>
+          <div class="price-row">
+            <p class="price" id="hero-price">{peso(models[0].price + batteries[1].add)}</p>
+            <p class="monthly" id="hero-monthly"></p>
+          </div>
+          <div class="buy-actions">
+            <button class="btn btn-sun" type="submit">Add to cart</button>
+            <a class="btn btn-ghost" href="#test-ride">Book a test ride</a>
+          </div>
+          <p class="perks">Free pickup in {brand.town}. Cash on delivery available. 2-year motor warranty.</p>
+        </form>
+      </section>
+
+      <section id="bikes" class="lineup">
+        <h2>Pick your ride</h2>
+        <ul class="models">
+          {models.map((m) => (
+            <li class="model">
+              <svg viewBox="0 0 400 260" aria-hidden="true" set:html={bike(m.color)} />
+              <h3>{m.name}</h3>
+              <p class="m-note">{m.note}</p>
+              <dl class="m-specs">
+                <div><dt>Range</dt><dd>{m.range} km</dd></div>
+                <div><dt>Top speed</dt><dd>{m.speed} km/h</dd></div>
+                <div><dt>Motor</dt><dd>{m.motor}</dd></div>
+                <div><dt>Weight</dt><dd>{m.weight}</dd></div>
+              </dl>
+              <div class="m-foot">
+                <span class="m-price">{peso(m.price)}</span>
+                <button type="button" class="btn btn-navy" data-add-model={m.id} data-name={m.name} data-price={m.price}>Add to cart</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section id="range" class="calc-sec">
+        <div class="calc">
+          <div class="calc-in">
+            <h2>How far will it go?</h2>
+            <p class="lede">Real range depends on you and your roads. Set yours and see.</p>
+            <form id="range-form" class="sliders">
+              <label>Battery
+                <select name="ah">{batteries.map((b) => <option value={b.ah} selected={b.ah === 15}>{b.label}, 48 V</option>)}</select>
+              </label>
+              <label>Rider weight <output id="kg-out">70 kg</output>
+                <input type="range" name="kg" min="40" max="120" value="70" />
+              </label>
+              <fieldset><legend>Roads</legend>
+                <div class="seg">
+                  <label><input type="radio" name="road" value="1" checked /><span>Mostly flat</span></label>
+                  <label><input type="radio" name="road" value="0.85" /><span>Mixed</span></label>
+                  <label><input type="radio" name="road" value="0.7" /><span>Hilly</span></label>
+                </div>
+              </fieldset>
+              <fieldset><legend>Pedal assist</legend>
+                <div class="seg">
+                  <label><input type="radio" name="assist" value="1.25" /><span>Eco</span></label>
+                  <label><input type="radio" name="assist" value="1" checked /><span>Normal</span></label>
+                  <label><input type="radio" name="assist" value="0.75" /><span>Sport</span></label>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+          <div class="calc-out" aria-live="polite">
+            <p class="big"><span id="km">60</span> km</p>
+            <p>on one charge</p>
+            <div class="road" aria-hidden="true"><span id="road-bar"></span></div>
+            <dl class="costs">
+              <div><dt>Full charge</dt><dd id="charge">₱9</dd></div>
+              <div><dt>Per 10 km</dt><dd id="per">₱1.50</dd></div>
+              <div><dt>Charging time</dt><dd id="hrs">6 hours</dd></div>
+            </dl>
+            <p class="small">Electricity at ₱12 per kWh. Adjust to your bill.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="pay" class="calc-sec alt">
+        <div class="calc">
+          <div class="calc-in">
+            <h2>Pay a little each month</h2>
+            <p class="lede">0% for 3 and 6 months on credit card. Longer terms through our financing partner.</p>
+            <form id="pay-form" class="sliders">
+              <label>Bike
+                <select name="model">{models.map((m) => <option value={m.price}>{m.name}, {peso(m.price)}</option>)}</select>
+              </label>
+              <fieldset><legend>Down payment</legend>
+                <div class="seg">
+                  {[20, 30, 50].map((d, i) => <label><input type="radio" name="down" value={d} checked={i === 0} /><span>{d}%</span></label>)}
+                </div>
+              </fieldset>
+              <fieldset><legend>Months to pay</legend>
+                <div class="seg">
+                  {[3, 6, 12, 24].map((m) => <label><input type="radio" name="months" value={m} checked={m === 12} /><span>{m}</span></label>)}
+                </div>
+              </fieldset>
+            </form>
+          </div>
+          <div class="calc-out" aria-live="polite">
+            <p class="big" id="monthly">₱0</p>
+            <p>a month</p>
+            <dl class="costs">
+              <div><dt>Down payment</dt><dd id="down-amt"></dd></div>
+              <div><dt>Interest</dt><dd id="rate"></dd></div>
+              <div><dt>Total you pay</dt><dd id="total-pay"></dd></div>
+            </dl>
+            <p class="small">Sample rates. Final terms depend on approval.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="service" class="service">
+        <h2>After you ride home</h2>
+        <div class="svc">
+          <div><h3>2-year warranty</h3><p>On the motor and controller. One year on the battery, with a free health check every 6 months.</p></div>
+          <div><h3>Service at the shop</h3><p>Brake adjustment, tire changes and battery checks. Most jobs are done while you wait.</p></div>
+          <div><h3>Parts in stock</h3><p>Tires, brake pads, chargers and batteries for every model we sell.</p></div>
+        </div>
+        <form class="test" id="test-ride">
+          <h3>Book a test ride</h3>
+          <label>Name <input name="who" required autocomplete="name" /></label>
+          <label>Mobile number <input name="tel" required inputmode="tel" autocomplete="tel" /></label>
+          <label>Day <input name="day" type="date" required /></label>
+          <button class="btn btn-sun" type="submit">Book test ride</button>
+          <p class="ok" id="test-ok" hidden>Test ride booked. Bring a valid ID, and we'll text you a reminder the day before.</p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="foot"><p><span data-brand>{brand.name}</span>, {brand.town}. <a href={`tel:${brand.phone.replace(/\s/g, '')}`}>{brand.phone}</a>, <a href={brand.messenger}>Messenger</a></p></footer>
+
+    <dialog class="cart" id="cart" aria-labelledby="cart-title">
+      <div class="cart-head">
+        <h2 id="cart-title">Your cart</h2>
+        <button type="button" id="close-cart" class="x">Close</button>
+      </div>
+      <div id="cart-body">
+        <p class="cart-empty" id="cart-empty">Your cart is empty. Pick a bike to get started.</p>
+        <ul class="lines" id="lines"></ul>
+        <form class="checkout" id="checkout">
+          <fieldset><legend>How do you want it?</legend>
+            <label class="opt"><input type="radio" name="ship" value="0" checked /> Pick up at the shop <b>Free</b></label>
+            <label class="opt"><input type="radio" name="ship" value="800" /> Deliver in Pampanga <b>₱800</b></label>
+            <label class="opt"><input type="radio" name="ship" value="2500" /> Deliver elsewhere in Luzon <b>₱2,500</b></label>
+          </fieldset>
+          <fieldset><legend>How will you pay?</legend>
+            <label class="opt"><input type="radio" name="pay" value="Cash on delivery or pickup" checked /> Cash on delivery or pickup</label>
+            <label class="opt"><input type="radio" name="pay" value="GCash" /> GCash</label>
+            <label class="opt"><input type="radio" name="pay" value="Bank transfer" /> Bank transfer</label>
+          </fieldset>
+          <label>Full name <input name="who" required autocomplete="name" /></label>
+          <label>Mobile number <input name="tel" required inputmode="tel" autocomplete="tel" /></label>
+          <label id="addr-field" hidden>Delivery address <textarea name="addr" rows="2" autocomplete="street-address"></textarea></label>
+          <div class="sum">
+            <div><span>Subtotal</span><span id="sub"></span></div>
+            <div><span>Delivery</span><span id="ship-amt"></span></div>
+            <div class="grand"><span>Total</span><strong id="grand"></strong></div>
+          </div>
+          <button class="btn btn-sun wide" type="submit">Place order</button>
+        </form>
+      </div>
+      <div class="placed" id="placed" hidden>
+        <h3>Order placed</h3>
+        <p id="placed-text"></p>
+        <button type="button" class="btn btn-navy" id="placed-close">Keep browsing</button>
+      </div>
+    </dialog>
+
+    <DemoBadge />
+
+    <script>
+      const peso = (n: number) => '₱' + Math.round(n).toLocaleString('en-PH');
+      const $ = (id: string) => document.getElementById(id)!;
+      type Line = { key: string; name: string; detail: string; price: number; qty: number };
+      const KEY = 'ebike-cart';
+      let cart: Line[] = [];
+      try { cart = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch {}
+      const save = () => { try { localStorage.setItem(KEY, JSON.stringify(cart)); } catch {} };
+
+      // Hero configurator
+      const buy = $('buy') as HTMLFormElement;
+      function hero() {
+        const color = buy.querySelector<HTMLInputElement>('input[name=color]:checked')!;
+        const batt = buy.querySelector<HTMLInputElement>('input[name=batt]:checked')!;
+        $('hero-frame').setAttribute('stroke', color.dataset.hex!);
+        $('color-name').textContent = color.value;
+        const price = 38900 + Number(batt.dataset.add);
+        $('hero-price').textContent = peso(price);
+        $('hero-monthly').textContent = `or ${peso((price * 0.8) / 6)} a month for 6 months at 0%`;
+        return { color: color.value, batt: batt.value, price };
+      }
+      buy.addEventListener('input', hero);
+      buy.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const h = hero();
+        add({ key: `city-${h.color}-${h.batt}`, name: 'City 2', detail: `${h.color}, ${h.batt} battery`, price: h.price, qty: 1 });
+      });
+      document.querySelectorAll<HTMLButtonElement>('[data-add-model]').forEach((b) =>
+        b.addEventListener('click', () => add({ key: b.dataset.addModel!, name: b.dataset.name!, detail: 'Standard color, 10 Ah battery', price: Number(b.dataset.price), qty: 1 }))
+      );
+
+      // Cart
+      const dialog = $('cart') as HTMLDialogElement;
+      const checkout = $('checkout') as HTMLFormElement;
+      function add(line: Line) {
+        const found = cart.find((l) => l.key === line.key);
+        if (found) found.qty++;
+        else cart.push(line);
+        save();
+        render();
+        $('cart-body').hidden = false;
+        $('placed').hidden = true;
+        dialog.showModal();
+      }
+      function render() {
+        $('cart-count').textContent = String(cart.reduce((s, l) => s + l.qty, 0));
+        const lines = $('lines');
+        lines.innerHTML = '';
+        cart.forEach((l, i) => {
+          const li = document.createElement('li');
+          li.innerHTML = `<div><strong></strong><small></small></div><div class="qty"><button type="button" data-dec="${i}" aria-label="One less">−</button><span>${l.qty}</span><button type="button" data-inc="${i}" aria-label="One more">+</button></div><span class="lp">${peso(l.price * l.qty)}</span>`;
+          li.querySelector('strong')!.textContent = l.name;
+          li.querySelector('small')!.textContent = l.detail;
+          lines.append(li);
+        });
+        $('cart-empty').hidden = cart.length > 0;
+        checkout.hidden = cart.length === 0;
+        totals();
+      }
+      function totals() {
+        const d = new FormData(checkout);
+        const sub = cart.reduce((s, l) => s + l.price * l.qty, 0);
+        const ship = Number(d.get('ship'));
+        $('sub').textContent = peso(sub);
+        $('ship-amt').textContent = ship ? peso(ship) : 'Free';
+        $('grand').textContent = peso(sub + ship);
+        $('addr-field').hidden = ship === 0;
+        (checkout.elements.namedItem('addr') as HTMLTextAreaElement).required = ship !== 0;
+        return sub + ship;
+      }
+      $('lines').addEventListener('click', (e) => {
+        const t = e.target as HTMLElement;
+        const inc = t.dataset.inc, dec = t.dataset.dec;
+        if (inc !== undefined) cart[Number(inc)].qty++;
+        else if (dec !== undefined) { const l = cart[Number(dec)]; l.qty--; if (l.qty <= 0) cart.splice(Number(dec), 1); }
+        else return;
+        save();
+        render();
+      });
+      checkout.addEventListener('input', totals);
+      checkout.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const total = totals();
+        const d = new FormData(checkout);
+        const no = 'KB-' + String(Date.now()).slice(-6);
+        $('placed-text').textContent = `Order ${no} for ${peso(total)}, paid by ${String(d.get('pay')).toLowerCase()}. We'll text ${d.get('tel')} within the hour to confirm ${Number(d.get('ship')) ? 'the delivery date' : 'your pickup time'}.`;
+        cart = [];
+        save();
+        render();
+        $('cart-body').hidden = true;
+        $('placed').hidden = false;
+      });
+      $('open-cart').addEventListener('click', () => { $('cart-body').hidden = false; $('placed').hidden = true; dialog.showModal(); });
+      $('close-cart').addEventListener('click', () => dialog.close());
+      $('placed-close').addEventListener('click', () => dialog.close());
+      dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+
+      // Range estimator
+      const rf = $('range-form') as HTMLFormElement;
+      function range() {
+        const d = new FormData(rf);
+        const ah = Number(d.get('ah')), kg = Number(d.get('kg'));
+        const wh = ah * 48;
+        const km = (wh / 12) * (1 - (kg - 70) * 0.004) * Number(d.get('road')) * Number(d.get('assist'));
+        const charge = (wh / 1000) * 12 / 0.85;
+        $('kg-out').textContent = `${kg} kg`;
+        $('km').textContent = String(Math.round(km));
+        ($('road-bar') as HTMLElement).style.width = Math.min(100, (km / 110) * 100) + '%';
+        $('charge').textContent = '₱' + charge.toFixed(0);
+        $('per').textContent = '₱' + ((charge / km) * 10).toFixed(2);
+        $('hrs').textContent = `${Math.round(ah / 2.5)} hours`;
+      }
+      rf.addEventListener('input', range);
+
+      // Installments
+      const pf = $('pay-form') as HTMLFormElement;
+      function pay() {
+        const d = new FormData(pf);
+        const price = Number(d.get('model')), down = (price * Number(d.get('down'))) / 100, months = Number(d.get('months'));
+        const rate = months <= 6 ? 0 : 0.012;
+        const financed = price - down;
+        const monthly = financed / months + financed * rate;
+        $('monthly').textContent = peso(monthly);
+        $('down-amt').textContent = peso(down);
+        $('rate').textContent = rate ? '1.2% a month, add-on' : '0%';
+        $('total-pay').textContent = peso(down + monthly * months);
+      }
+      pf.addEventListener('input', pay);
+
+      const day = document.querySelector<HTMLInputElement>('#test-ride input[name=day]')!;
+      const tm = new Date(); tm.setDate(tm.getDate() + 1);
+      day.min = new Date(tm.getTime() - tm.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+      ($('test-ride') as HTMLFormElement).addEventListener('submit', (e) => { e.preventDefault(); $('test-ok').hidden = false; });
+
+      hero(); render(); range(); pay();
+    </script>
+
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      :root {
+        --sky: #eaf3fb;
+        --navy: #13233f;
+        --sun: #f6b100;
+        --white: #ffffff;
+        --leaf: #2e8b57;
+        --line: #d5e1ee;
+        --soft: #52627a;
+        --font: 'Lexend Variable', system-ui, sans-serif;
+      }
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      body { margin: 0; background: var(--white); color: var(--navy); font: 400 1.0625rem/1.6 var(--font); }
+      h1, h2, h3 { font-weight: 700; margin: 0; line-height: 1.08; letter-spacing: -0.03em; }
+      a { color: inherit; }
+      :focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+      .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+      .wheel circle { fill: none; stroke: var(--navy); stroke-width: 9; }
+      .wheel .rim { stroke: #9fb3c8; stroke-width: 2; }
+      .wheel .spoke { stroke: #9fb3c8; stroke-width: 1.2; }
+      .frame path { fill: none; stroke-width: 13; stroke-linecap: round; stroke-linejoin: round; }
+      .dark { fill: none; stroke: var(--navy); stroke-linecap: round; }
+    </style>
+
+    <style>
+      .top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 1.5rem; padding: 0.8rem clamp(1rem, 4vw, 3rem); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+      .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.2rem; text-decoration: none; letter-spacing: -0.02em; }
+      .logo svg { width: 30px; height: 30px; fill: none; stroke: var(--navy); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+      nav { display: flex; gap: 1.5rem; margin-left: auto; }
+      nav a { text-decoration: none; color: var(--soft); font-weight: 500; }
+      nav a:hover { color: var(--navy); }
+      .cart-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.6rem 0.55rem 1rem; background: var(--navy); color: var(--white); border: 0; border-radius: 999px; font: 600 0.95rem var(--font); cursor: pointer; }
+      .cart-btn span { display: grid; place-items: center; min-width: 1.6rem; height: 1.6rem; padding: 0 0.35rem; border-radius: 999px; background: var(--sun); color: var(--navy); font-size: 0.85rem; }
+
+      .btn { display: inline-flex; justify-content: center; align-items: center; padding: 0.85rem 1.4rem; border-radius: 999px; font: 600 1rem/1 var(--font); text-decoration: none; cursor: pointer; border: 2px solid transparent; }
+      .btn-sun { background: var(--sun); color: var(--navy); }
+      .btn-sun:hover { background: #ffc21f; }
+      .btn-navy { background: var(--navy); color: var(--white); }
+      .btn-navy:hover { background: #22375e; }
+      .btn-ghost { border-color: var(--navy); }
+      .btn-ghost:hover { background: var(--navy); color: var(--white); }
+      .wide { width: 100%; }
+
+      section { padding: clamp(3rem, 7vw, 5.5rem) clamp(1rem, 4vw, 3rem); }
+      h2 { font-size: clamp(2rem, 4.5vw, 3.2rem); }
+      .lede { color: var(--soft); max-width: 46ch; margin: 0.75rem 0 1.75rem; }
+      .small { font-size: 0.85rem; color: var(--soft); }
+
+      .hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; background: var(--sky); }
+      .stage { position: relative; display: grid; place-items: center; min-height: 26rem; }
+      .sun { position: absolute; width: min(70%, 26rem); aspect-ratio: 1; border-radius: 50%; background: var(--white); top: 6%; right: 8%; }
+      .bike-big { position: relative; width: 100%; max-width: 40rem; height: auto; }
+      .bike-big :global(.frame) { transition: stroke 0.3s; }
+      @media (prefers-reduced-motion: reduce) { .bike-big :global(.frame) { transition: none; } }
+      .model-line { margin: 0 0 0.6rem; font-weight: 600; color: var(--leaf); }
+      .buy h1 { font-size: clamp(2rem, 4vw, 3.2rem); max-width: 16ch; margin-bottom: 1.5rem; }
+      fieldset { border: 0; padding: 0; margin: 0 0 1.25rem; }
+      legend { font-weight: 600; margin-bottom: 0.6rem; }
+      legend span { font-weight: 400; color: var(--soft); margin-left: 0.4rem; }
+      .dots { display: flex; gap: 0.7rem; }
+      .dots input, .batts input, .seg input { position: absolute; opacity: 0; }
+      .dots span:not(.sr) { display: block; width: 38px; height: 38px; border-radius: 50%; background: var(--c); cursor: pointer; box-shadow: inset 0 0 0 1px rgba(0,0,0,.1); }
+      .dots input:checked + span { box-shadow: 0 0 0 3px var(--sky), 0 0 0 5px var(--navy); }
+      .dots input:focus-visible + span { outline: 3px solid var(--sun); outline-offset: 6px; }
+      .batts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+      .batts span { display: grid; gap: 0.1rem; padding: 0.65rem 0.75rem; border: 2px solid var(--line); border-radius: 14px; background: var(--white); cursor: pointer; }
+      .batts small { color: var(--soft); font-size: 0.82rem; line-height: 1.3; }
+      .batts input:checked + span { border-color: var(--navy); }
+      .batts input:focus-visible + span { outline: 3px solid var(--sun); outline-offset: 2px; }
+      .price-row { display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin: 0.5rem 0 1.25rem; }
+      .price { margin: 0; font-size: 2.4rem; font-weight: 700; letter-spacing: -0.03em; }
+      .monthly { margin: 0; color: var(--soft); }
+      .buy-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+      .perks { color: var(--soft); font-size: 0.92rem; margin: 1rem 0 0; }
+
+      .lineup { max-width: 84rem; margin: 0 auto; }
+      .models { list-style: none; margin: 2rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; }
+      .model { display: flex; flex-direction: column; padding: 1.25rem; border-radius: 22px; background: var(--sky); }
+      .model svg { width: 100%; height: auto; margin-bottom: 0.5rem; }
+      .model h3 { font-size: 1.6rem; }
+      .m-note { color: var(--soft); margin: 0.4rem 0 1rem; font-size: 0.95rem; }
+      .m-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1rem; margin: 0 0 1.25rem; }
+      .m-specs dt { font-size: 0.8rem; color: var(--soft); }
+      .m-specs dd { margin: 0; font-weight: 600; }
+      .m-foot { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-top: auto; flex-wrap: wrap; }
+      .m-price { font-weight: 700; font-size: 1.3rem; }
+
+      .calc-sec { background: var(--navy); color: var(--white); }
+      .calc-sec .lede { color: #b5c3d8; }
+      .calc-sec.alt { background: var(--sky); color: var(--navy); }
+      .calc-sec.alt .lede { color: var(--soft); }
+      .calc { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(2rem, 5vw, 4rem); max-width: 76rem; margin: 0 auto; align-items: center; }
+      .sliders { display: grid; gap: 1.25rem; }
+      .sliders > label { display: grid; gap: 0.4rem; font-weight: 600; }
+      .sliders output { float: right; font-weight: 400; }
+      .sliders select { font: inherit; padding: 0.65rem 0.8rem; border-radius: 12px; border: 2px solid var(--line); background: var(--white); color: var(--navy); }
+      input[type='range'] { width: 100%; accent-color: var(--sun); }
+      .seg { display: flex; background: rgba(255, 255, 255, 0.1); border-radius: 999px; padding: 4px; }
+      .alt .seg { background: var(--white); }
+      .seg label { flex: 1; }
+      .seg span { display: block; text-align: center; padding: 0.5rem 0.4rem; border-radius: 999px; cursor: pointer; font-weight: 500; }
+      .seg input:checked + span { background: var(--sun); color: var(--navy); font-weight: 600; }
+      .seg input:focus-visible + span { outline: 3px solid var(--sun); outline-offset: 2px; }
+      .calc-out { background: var(--white); color: var(--navy); border-radius: 28px; padding: clamp(1.5rem, 3vw, 2.25rem); }
+      .alt .calc-out { background: var(--navy); color: var(--white); }
+      .calc-out > p { margin: 0; }
+      .big { font-size: clamp(3.2rem, 7vw, 5rem) !important; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+      .road { height: 14px; border-radius: 7px; background: var(--sky); margin: 1.25rem 0; overflow: hidden; }
+      .road span { display: block; height: 100%; background: repeating-linear-gradient(90deg, var(--sun) 0 18px, #ffd35c 18px 26px); border-radius: 7px; transition: width 0.3s; }
+      @media (prefers-reduced-motion: reduce) { .road span { transition: none; } }
+      .costs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; margin: 1.25rem 0 0.75rem; }
+      .costs dt { font-size: 0.8rem; opacity: 0.7; }
+      .costs dd { margin: 0; font-weight: 700; font-size: 1.15rem; }
+      .alt .small { color: #b5c3d8; }
+
+      .service { max-width: 84rem; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr; gap: 2.5rem 3rem; align-items: start; }
+      .service h2 { grid-column: 1 / -1; }
+      .svc { display: grid; gap: 1.5rem; }
+      .svc h3 { font-size: 1.3rem; margin-bottom: 0.3rem; }
+      .svc p { margin: 0; color: var(--soft); }
+      .test { display: grid; gap: 0.8rem; background: var(--sky); padding: 1.5rem; border-radius: 22px; }
+      .test h3 { font-size: 1.5rem; }
+      .test label, .checkout > label { display: grid; gap: 0.3rem; font-weight: 600; font-size: 0.95rem; }
+      .test input, .checkout input:not([type='radio']), .checkout textarea { font: inherit; font-weight: 400; padding: 0.6rem 0.8rem; border: 2px solid var(--line); border-radius: 12px; background: var(--white); color: var(--navy); }
+      .ok { margin: 0; padding: 0.75rem 1rem; background: #e2f3e9; border-radius: 12px; color: #1d5a39; }
+
+      .foot { padding: 1.5rem 1rem 4.5rem; text-align: center; color: var(--soft); font-size: 0.9rem; border-top: 1px solid var(--line); }
+      .foot p { margin: 0; }
+
+      .cart { margin: 0 0 0 auto; width: min(100%, 27rem); height: 100dvh; max-height: 100dvh; border: 0; padding: 1.5rem; background: var(--white); color: var(--navy); }
+      .cart::backdrop { background: rgba(19, 35, 63, 0.45); }
+      .cart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+      .cart-head h2 { font-size: 1.7rem; }
+      .x { background: var(--sky); border: 0; border-radius: 999px; padding: 0.45rem 0.9rem; font: 500 0.9rem var(--font); cursor: pointer; color: var(--navy); }
+      .cart-empty { color: var(--soft); }
+      .lines { list-style: none; margin: 0 0 1.25rem; padding: 0; }
+      .lines :global(li) { display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem; align-items: center; padding: 0.85rem 0; border-bottom: 1px solid var(--line); }
+      .lines :global(small) { display: block; color: var(--soft); font-size: 0.82rem; }
+      .lines :global(.qty) { display: flex; align-items: center; gap: 0.4rem; }
+      .lines :global(.qty button) { width: 1.8rem; height: 1.8rem; border-radius: 50%; border: 0; background: var(--sky); font: 600 1rem var(--font); cursor: pointer; color: var(--navy); }
+      .lines :global(.lp) { font-weight: 700; }
+      .checkout { display: grid; gap: 0.9rem; }
+      .checkout fieldset { margin: 0; display: grid; gap: 0.35rem; }
+      .opt { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.75rem; border: 2px solid var(--line); border-radius: 12px; cursor: pointer; font-size: 0.95rem; }
+      .opt:has(input:checked) { border-color: var(--navy); }
+      .opt b { margin-left: auto; font-weight: 600; }
+      .opt input { accent-color: var(--navy); }
+      .sum { display: grid; gap: 0.35rem; padding-top: 0.75rem; border-top: 1px solid var(--line); }
+      .sum div { display: flex; justify-content: space-between; }
+      .grand strong { font-size: 1.5rem; }
+      .placed { padding: 1rem 0; }
+      .placed h3 { font-size: 1.6rem; color: var(--leaf); margin-bottom: 0.5rem; }
+
+      @media (max-width: 1100px) { .models { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+      @media (max-width: 860px) {
+        nav { display: none; }
+        .cart-btn { margin-left: auto; }
+        .hero, .calc, .service { grid-template-columns: 1fr; }
+        .stage { min-height: 16rem; }
+      }
+      @media (max-width: 560px) {
+        .models, .batts, .costs { grid-template-columns: 1fr; }
+      }
+    </style>
+  </body>
+</html>

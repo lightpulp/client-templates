@@ -1,0 +1,485 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import DemoBadge from '../components/DemoBadge.astro';
+
+const brand = { name: 'Ironclad Safes', town: 'San Fernando, Pampanga', phone: '0917 000 0000', messenger: 'https://m.me/yourpage' };
+
+interface Model { id: string; name: string; h: number; w: number; d: number; kg: number; long: number; hand: number; fire: number; lock: string; price: number }
+const models: Model[] = [
+  { id: 'G-12', name: 'Compact', h: 60, w: 40, d: 40, kg: 65, long: 0, hand: 6, fire: 30, lock: 'Digital keypad', price: 28000 },
+  { id: 'D-20', name: 'Document Vault', h: 75, w: 55, d: 50, kg: 140, long: 0, hand: 4, fire: 120, lock: 'Dial combination', price: 64000 },
+  { id: 'G-24', name: 'Sentinel', h: 140, w: 55, d: 45, kg: 180, long: 12, hand: 6, fire: 30, lock: 'Digital and key', price: 58000 },
+  { id: 'G-36', name: 'Ranger', h: 150, w: 70, d: 55, kg: 260, long: 18, hand: 10, fire: 60, lock: 'Digital and key', price: 89000 },
+  { id: 'G-48', name: 'Fortress', h: 165, w: 90, d: 60, kg: 380, long: 24, hand: 16, fire: 60, lock: 'Biometric and key', price: 132000 },
+  { id: 'G-60', name: 'Armory', h: 183, w: 100, d: 65, kg: 520, long: 36, hand: 24, fire: 120, lock: 'Biometric and key', price: 210000 },
+];
+const peso = (n: number) => '₱' + n.toLocaleString('en-PH');
+
+// Front-view technical drawing, drawn to scale from the model's dimensions.
+const draw = (m: Model) => {
+  const s = 1.42, W = m.w * s, H = m.h * s, x = 190 - W / 2, y = 292 - H;
+  const r = Math.min(W, H) * 0.11, hx = x + W * 0.66, hy = y + H * 0.46;
+  const spokes = [0, 60, 120].map((a) => {
+    const t = (a * Math.PI) / 180;
+    return `<line x1="${hx - Math.cos(t) * r * 1.35}" y1="${hy - Math.sin(t) * r * 1.35}" x2="${hx + Math.cos(t) * r * 1.35}" y2="${hy + Math.sin(t) * r * 1.35}"/>`;
+  }).join('');
+  return `
+    <g class="dwg-body">
+      <rect x="${x + 6}" y="292" width="10" height="6"/><rect x="${x + W - 16}" y="292" width="10" height="6"/>
+      <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="4"/>
+      <rect class="door" x="${x + 7}" y="${y + 7}" width="${W - 14}" height="${H - 14}" rx="2"/>
+      <rect class="hinge" x="${x + 2}" y="${y + H * 0.18}" width="5" height="14"/><rect class="hinge" x="${x + 2}" y="${y + H * 0.72}" width="5" height="14"/>
+      <rect class="pad" x="${hx - 9}" y="${hy - r - 26}" width="18" height="14" rx="2"/>
+      <g class="wheel">${spokes}<circle cx="${hx}" cy="${hy}" r="${r * 0.42}"/></g>
+    </g>
+    <g class="dwg-dim">
+      <line x1="${x - 20}" y1="${y}" x2="${x - 20}" y2="292"/><line x1="${x - 26}" y1="${y}" x2="${x - 8}" y2="${y}"/><line x1="${x - 26}" y1="292" x2="${x - 8}" y2="292"/>
+      <text x="${x - 28}" y="${y + H / 2}" transform="rotate(-90 ${x - 28} ${y + H / 2})" text-anchor="middle">${m.h} cm</text>
+      <line x1="${x}" y1="310" x2="${x + W}" y2="310"/><line x1="${x}" y1="304" x2="${x}" y2="316"/><line x1="${x + W}" y1="304" x2="${x + W}" y2="316"/>
+      <text x="${x + W / 2}" y="328" text-anchor="middle">${m.w} cm</text>
+      <text x="${x + W + 14}" y="${y + 12}">${m.d} cm deep</text>
+      <text x="${x + W + 14}" y="${y + 30}">${m.kg} kg</text>
+    </g>`;
+};
+const hero = models.find((m) => m.id === 'G-36')!;
+---
+<!doctype html>
+<html lang="en" data-default-brand={brand.name}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{brand.name} | Gun safes and document vaults</title>
+    <meta name="description" content={`Fire-rated gun safes and document vaults by ${brand.name}. Find the right size, compare specs and get a delivery estimate.`} />
+    <meta name="theme-color" content="#1F5466" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="logo" href="#top"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="2" width="18" height="19" rx="2" /><circle cx="14" cy="11.5" r="3.2" /><path d="M6 23h3M15 23h3" /></svg><span data-brand>{brand.name}</span></a>
+      <nav aria-label="Main">
+        <a href="#finder">Safe finder</a>
+        <a href="#specs">Compare</a>
+        <a href="#delivery">Delivery</a>
+        <a href="#dealers">Dealers</a>
+      </nav>
+      <a class="btn btn-teal" href="#quote">Get a quote</a>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <h1>Safes sized to what you keep</h1>
+          <p>Fire-rated gun safes and document vaults, built from 3 mm steel and delivered, carried in and bolted down by our own crew.</p>
+          <div class="actions">
+            <a class="btn btn-teal" href="#finder">Find my size</a>
+            <a class="btn btn-line" href="#specs">Compare all models</a>
+          </div>
+        </div>
+        <figure class="hero-dwg">
+          <svg viewBox="0 0 380 336" role="img" aria-label={`${hero.id} ${hero.name}, ${hero.h} by ${hero.w} centimeters`} set:html={draw(hero)} />
+          <figcaption>{hero.id} {hero.name}, our most chosen home safe</figcaption>
+        </figure>
+      </section>
+
+      <section id="finder" class="finder">
+        <div class="sec-head">
+          <h2>Safe finder</h2>
+          <p>Tell us what you need to store. We'll show the smallest safe that fits it with room to grow.</p>
+        </div>
+        <div class="finder-grid">
+          <form class="inputs" id="finder-form">
+            <label class="range">
+              <span>Rifles and shotguns <output id="long-out">6</output></span>
+              <input type="range" name="long" min="0" max="36" value="6" />
+            </label>
+            <label class="range">
+              <span>Handguns <output id="hand-out">4</output></span>
+              <input type="range" name="hand" min="0" max="24" value="4" />
+            </label>
+            <fieldset>
+              <legend>Fire protection</legend>
+              <div class="seg">
+                {[0, 30, 60, 120].map((f, i) => (
+                  <label><input type="radio" name="fire" value={f} checked={i === 2} /><span>{f ? `${f} min` : 'None'}</span></label>
+                ))}
+              </div>
+              <p class="hint">Minutes the inside stays below paper-burning temperature in a house fire.</p>
+            </fieldset>
+            <label class="check"><input type="checkbox" name="docs" checked /> I also keep documents, cash or jewelry</label>
+            <label class="check"><input type="checkbox" name="grow" checked /> Leave room for 30% more</label>
+          </form>
+
+          <div class="result" aria-live="polite">
+            <p class="r-kicker" id="r-kicker">Recommended for you</p>
+            <h3 id="r-name"></h3>
+            <div class="r-body">
+              <svg id="r-dwg" viewBox="0 0 380 336" aria-hidden="true"></svg>
+              <div class="r-stats">
+                <div class="meter"><span>Long guns</span><div class="bar"><i id="m-long"></i></div><small id="t-long"></small></div>
+                <div class="meter"><span>Handguns</span><div class="bar"><i id="m-hand"></i></div><small id="t-hand"></small></div>
+                <p class="fire" id="r-fire"></p>
+                <p class="r-price" id="r-price"></p>
+                <a class="btn btn-teal" href="#quote" id="r-quote">Get a quote for this safe</a>
+              </div>
+            </div>
+            <p class="alts" id="r-alts"></p>
+          </div>
+        </div>
+        {models.map((m) => <template data-dwg={m.id} set:html={`<svg>${draw(m)}</svg>`} />)}
+      </section>
+
+      <section id="specs" class="specs">
+        <div class="sec-head">
+          <h2>Every model, side by side</h2>
+          <p>Select a column heading to sort. Outside dimensions are height by width by depth.</p>
+        </div>
+        <div class="table-wrap">
+          <table id="spec-table">
+            <thead>
+              <tr>
+                <th scope="col"><button type="button" data-sort="id">Model</button></th>
+                <th scope="col"><button type="button" data-sort="h">Outside size (cm)</button></th>
+                <th scope="col"><button type="button" data-sort="kg">Weight</button></th>
+                <th scope="col"><button type="button" data-sort="long">Long guns</button></th>
+                <th scope="col"><button type="button" data-sort="hand">Handguns</button></th>
+                <th scope="col"><button type="button" data-sort="fire">Fire rating</button></th>
+                <th scope="col">Lock</th>
+                <th scope="col"><button type="button" data-sort="price">Price</button></th>
+              </tr>
+            </thead>
+            <tbody>
+              {models.map((m) => (
+                <tr data-id={m.id} data-h={m.h} data-kg={m.kg} data-long={m.long} data-hand={m.hand} data-fire={m.fire} data-price={m.price}>
+                  <th scope="row"><span class="m-id">{m.id}</span> {m.name}</th>
+                  <td>{m.h} × {m.w} × {m.d}</td>
+                  <td>{m.kg} kg</td>
+                  <td>{m.long || '—'}</td>
+                  <td>{m.hand}</td>
+                  <td><span class:list={['badge', `f${m.fire}`]}>{m.fire} min</span></td>
+                  <td>{m.lock}</td>
+                  <td class="price">{peso(m.price)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="delivery" class="delivery">
+        <div class="sec-head">
+          <h2>Delivered, carried in and bolted down</h2>
+          <p>A 260 kg safe doesn't go up the stairs by itself. Our crew handles it from truck to floor.</p>
+        </div>
+        <div class="del-grid">
+          <ol class="steps">
+            <li><h3>Site check</h3><p>Send a photo of the spot and the path to it. We check doors, stairs and floor strength.</p></li>
+            <li><h3>Delivery</h3><p>Our crew brings the safe on a stair-climbing dolly. No damage to floors or walls.</p></li>
+            <li><h3>Bolt-down</h3><p>Anchored to concrete with four expansion bolts, from inside the safe.</p></li>
+            <li><h3>Handover</h3><p>We set your code, register your fingerprint and hand you the backup keys.</p></li>
+          </ol>
+          <form class="estimate" id="estimate">
+            <h3>Delivery estimate</h3>
+            <label>Safe
+              <select name="model">{models.map((m) => <option value={m.id} data-kg={m.kg}>{m.id} {m.name}</option>)}</select>
+            </label>
+            <label>Deliver to
+              <select name="area">
+                <option value="1500">Within San Fernando</option>
+                <option value="2500">Elsewhere in Pampanga</option>
+                <option value="4500">Other Central Luzon provinces</option>
+                <option value="6000">Metro Manila</option>
+              </select>
+            </label>
+            <label>Floor
+              <select name="floor">
+                <option value="0">Ground floor</option>
+                <option value="1">2nd floor</option>
+                <option value="2">3rd floor</option>
+                <option value="3">4th floor or higher</option>
+              </select>
+            </label>
+            <label class="check"><input type="checkbox" name="bolt" checked /> Bolt it to the floor, ₱1,500</label>
+            <p class="est-total"><span>Estimated delivery</span><strong id="est-total"></strong></p>
+            <p class="hint">Final price after the site check. Free delivery within San Fernando for the G-48 and G-60.</p>
+          </form>
+        </div>
+      </section>
+
+      <section id="dealers" class="dealers">
+        <div>
+          <h2>For dealers, offices and gun stores</h2>
+          <p>Volume pricing from five units, your store's branding on the door plate, and stock reserved for your orders. We supply gun stores, banks, schools and government offices across Central Luzon.</p>
+        </div>
+        <ul class="dealer-facts">
+          <li><strong>From 5 units</strong><span>Dealer pricing</span></li>
+          <li><strong>Lifetime</strong><span>Warranty on the body</span></li>
+          <li><strong>5 years</strong><span>Warranty on locks</span></li>
+        </ul>
+      </section>
+
+      <section id="quote" class="quote">
+        <form class="quote-form" id="quote-form">
+          <h2>Get a quote</h2>
+          <p>We reply within one working day with the price, delivery date and any questions about your space.</p>
+          <div class="q-grid">
+            <label>Name <input name="who" required autocomplete="name" /></label>
+            <label>Mobile number <input name="tel" required inputmode="tel" autocomplete="tel" /></label>
+            <label>Safe <select name="model" id="quote-model">{models.map((m) => <option value={m.id}>{m.id} {m.name}</option>)}<option>Not sure yet</option></select></label>
+            <label>Quantity <input name="qty" type="number" min="1" value="1" inputmode="numeric" /></label>
+            <label class="full">Anything we should know? <textarea name="note" rows="3" placeholder="e.g. 2nd floor bedroom, narrow staircase"></textarea></label>
+          </div>
+          <button type="submit" class="btn btn-teal">Request quote</button>
+          <p class="ok" id="quote-ok" hidden>Quote requested. We'll text you within one working day.</p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p><span data-brand>{brand.name}</span>, {brand.town}. <a href={`tel:${brand.phone.replace(/\s/g, '')}`}>{brand.phone}</a></p>
+      <p>Showroom open Monday to Saturday, 9 AM to 6 PM.</p>
+    </footer>
+
+    <DemoBadge />
+
+    <script type="application/json" id="models" set:html={JSON.stringify(models)} />
+    <script>
+      type Model = { id: string; name: string; h: number; w: number; d: number; kg: number; long: number; hand: number; fire: number; lock: string; price: number };
+      const models: Model[] = JSON.parse(document.getElementById('models')!.textContent!);
+      const peso = (n: number) => '₱' + n.toLocaleString('en-PH');
+      const $ = (id: string) => document.getElementById(id)!;
+      const form = $('finder-form') as HTMLFormElement;
+
+      function find() {
+        const d = new FormData(form);
+        const grow = d.get('grow') ? 1.3 : 1;
+        const long = Number(d.get('long')), hand = Number(d.get('hand'));
+        const needFire = Math.max(Number(d.get('fire')), d.get('docs') ? 30 : 0);
+        $('long-out').textContent = String(long);
+        $('hand-out').textContent = String(hand);
+        const fits = models
+          .filter((m) => m.long >= Math.ceil(long * grow) && m.hand >= Math.ceil(hand * grow) && m.fire >= needFire)
+          .sort((a, b) => a.price - b.price);
+        const pick = fits[0];
+        if (!pick) {
+          $('r-kicker').textContent = 'Custom build';
+          $('r-name').textContent = "That's more than our standard line holds";
+          $('r-dwg').innerHTML = '';
+          $('r-price').textContent = 'We build walk-in vaults and gun rooms to size. Ask for a site visit.';
+          $('r-fire').textContent = '';
+          $('t-long').textContent = $('t-hand').textContent = '';
+          ($('m-long') as HTMLElement).style.width = ($('m-hand') as HTMLElement).style.width = '100%';
+          $('r-alts').textContent = '';
+          return;
+        }
+        $('r-kicker').textContent = 'Recommended for you';
+        $('r-name').textContent = `${pick.id} ${pick.name}`;
+        $('r-dwg').innerHTML = document.querySelector<HTMLTemplateElement>(`template[data-dwg="${pick.id}"]`)!.content.querySelector('svg')!.innerHTML;
+        const pct = (n: number, cap: number) => (cap ? Math.min(100, (n / cap) * 100) : 0);
+        ($('m-long') as HTMLElement).style.width = pct(long, pick.long) + '%';
+        ($('m-hand') as HTMLElement).style.width = pct(hand, pick.hand) + '%';
+        $('t-long').textContent = pick.long ? `${long} of ${pick.long}` : 'Not built for long guns';
+        $('t-hand').textContent = `${hand} of ${pick.hand}`;
+        $('r-fire').innerHTML = `<span class="badge f${pick.fire}">${pick.fire} min</span> fire rating, ${pick.lock.toLowerCase()} lock`;
+        $('r-price').textContent = peso(pick.price);
+        $('r-alts').textContent = fits.length > 1 ? `Also fits: ${fits.slice(1).map((m) => `${m.id} ${m.name} (${peso(m.price)})`).join(', ')}` : '';
+        ($('quote-model') as HTMLSelectElement).value = pick.id;
+        (document.querySelector('#estimate select[name=model]') as HTMLSelectElement).value = pick.id;
+        estimate();
+      }
+      form.addEventListener('input', find);
+
+      // Sortable spec table
+      const tbody = document.querySelector('#spec-table tbody')!;
+      let sortKey = '', asc = true;
+      document.querySelectorAll<HTMLButtonElement>('[data-sort]').forEach((b) =>
+        b.addEventListener('click', () => {
+          const key = b.dataset.sort!;
+          asc = sortKey === key ? !asc : true;
+          sortKey = key;
+          const rows = [...tbody.querySelectorAll<HTMLTableRowElement>('tr')];
+          rows.sort((x, y) => {
+            const a = x.dataset[key]!, c = y.dataset[key]!;
+            const r = isNaN(Number(a)) ? a.localeCompare(c) : Number(a) - Number(c);
+            return asc ? r : -r;
+          }).forEach((r) => tbody.append(r));
+          document.querySelectorAll('[data-sort]').forEach((x) => x.closest('th')!.removeAttribute('aria-sort'));
+          b.closest('th')!.setAttribute('aria-sort', asc ? 'ascending' : 'descending');
+        })
+      );
+
+      // Delivery estimate
+      const est = $('estimate') as HTMLFormElement;
+      function estimate() {
+        const d = new FormData(est);
+        const m = models.find((x) => x.id === d.get('model'))!;
+        const free = ['G-48', 'G-60'].includes(m.id) && d.get('area') === '1500';
+        let total = free ? 0 : Number(d.get('area'));
+        total += Number(d.get('floor')) * 1000 * Math.ceil(m.kg / 100);
+        if (d.get('bolt')) total += 1500;
+        $('est-total').textContent = peso(total);
+      }
+      est.addEventListener('input', estimate);
+
+      ($('quote-form') as HTMLFormElement).addEventListener('submit', (e) => {
+        e.preventDefault();
+        $('quote-ok').hidden = false;
+      });
+
+      find();
+    </script>
+
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      :root {
+        --steel: #eef0f2;
+        --steel-2: #dfe3e7;
+        --line: #c4ccd3;
+        --graphite: #262d33;
+        --soft: #56616b;
+        --teal: #1f5466;
+        --amber: #d99a00;
+        --white: #ffffff;
+        --font: 'Archivo Variable', system-ui, sans-serif;
+      }
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      body { margin: 0; background: var(--steel); color: var(--graphite); font: 400 1.0625rem/1.55 var(--font); font-stretch: 100%; }
+      h1, h2, h3 { font-family: var(--font); font-stretch: 125%; font-weight: 800; margin: 0; line-height: 1.02; letter-spacing: -0.02em; }
+      a { color: inherit; }
+      :focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+      .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 3px; font-weight: 700; font-size: 0.85rem; font-stretch: 112%; }
+      .badge.f30 { background: #fbe7b5; color: #6b4b00; }
+      .badge.f60 { background: #f5c342; color: #3d2a00; }
+      .badge.f120 { background: #c4541b; color: #fff; }
+      .dwg-body rect, .dwg-body circle { fill: var(--white); stroke: var(--graphite); stroke-width: 1.6; }
+      .dwg-body .door { fill: #f6f7f8; }
+      .dwg-body .hinge { fill: var(--graphite); }
+      .dwg-body .pad { fill: var(--teal); stroke: none; }
+      .dwg-body .wheel line { stroke: var(--graphite); stroke-width: 3; stroke-linecap: round; }
+      .dwg-body .wheel circle { fill: var(--graphite); }
+      .dwg-dim line { stroke: var(--teal); stroke-width: 1; }
+      .dwg-dim text { fill: var(--teal); font: 600 11px var(--font); font-stretch: 110%; }
+    </style>
+
+    <style>
+      .top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 1.5rem; padding: 0.8rem clamp(1rem, 4vw, 3rem); background: var(--white); border-bottom: 1px solid var(--line); }
+      .logo { display: flex; align-items: center; gap: 0.55rem; text-decoration: none; font-weight: 800; font-stretch: 125%; font-size: 1.15rem; letter-spacing: -0.02em; }
+      .logo svg { width: 26px; height: 26px; fill: none; stroke: var(--teal); stroke-width: 2; }
+      nav { display: flex; gap: 1.4rem; margin-left: auto; }
+      nav a { text-decoration: none; color: var(--soft); font-weight: 500; }
+      nav a:hover { color: var(--graphite); }
+
+      .btn { display: inline-block; padding: 0.8rem 1.25rem; border-radius: 4px; font: 700 1rem/1 var(--font); font-stretch: 108%; text-decoration: none; cursor: pointer; border: 2px solid transparent; text-align: center; }
+      .btn-teal { background: var(--teal); color: var(--white); }
+      .btn-teal:hover { background: #17414f; }
+      .btn-line { border-color: var(--graphite); }
+      .btn-line:hover { background: var(--graphite); color: var(--white); }
+
+      section { padding: clamp(3rem, 7vw, 5.5rem) clamp(1rem, 4vw, 3rem); }
+      .sec-head { max-width: 50rem; margin-bottom: 2.25rem; }
+      .sec-head h2 { font-size: clamp(2rem, 4.6vw, 3.3rem); }
+      .sec-head p { color: var(--soft); max-width: 58ch; margin: 0.8rem 0 0; }
+
+      .hero {
+        display: grid; grid-template-columns: 1.1fr 1fr; gap: 2rem; align-items: center;
+        background: linear-gradient(var(--steel-2) 1px, transparent 1px) 0 0 / 28px 28px, linear-gradient(90deg, var(--steel-2) 1px, transparent 1px) 0 0 / 28px 28px, var(--steel);
+        border-bottom: 1px solid var(--line);
+      }
+      .hero h1 { font-size: clamp(2.8rem, 7.5vw, 6rem); max-width: 10ch; }
+      .hero-copy p { font-size: 1.2rem; max-width: 42ch; margin: 1.5rem 0 2rem; color: var(--soft); }
+      .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+      .hero-dwg { margin: 0; background: rgba(255, 255, 255, 0.7); border: 1px solid var(--line); padding: 1rem 1rem 0.75rem; }
+      .hero-dwg svg { width: 100%; height: auto; display: block; }
+      .hero-dwg figcaption { font-size: 0.9rem; color: var(--soft); border-top: 1px dashed var(--line); padding-top: 0.6rem; }
+
+      .finder { background: var(--white); }
+      .finder-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+      .inputs { display: grid; gap: 1.5rem; }
+      .range { display: grid; gap: 0.5rem; font-weight: 600; }
+      .range span { display: flex; justify-content: space-between; align-items: baseline; }
+      .range output { font-size: 2rem; font-weight: 800; font-stretch: 125%; color: var(--teal); line-height: 1; }
+      input[type='range'] { width: 100%; accent-color: var(--teal); height: 1.5rem; }
+      fieldset { border: 0; padding: 0; margin: 0; }
+      legend { font-weight: 600; margin-bottom: 0.5rem; }
+      .seg { display: grid; grid-template-columns: repeat(4, 1fr); border: 1.5px solid var(--graphite); border-radius: 4px; overflow: hidden; }
+      .seg label + label { border-left: 1.5px solid var(--graphite); }
+      .seg input { position: absolute; opacity: 0; }
+      .seg span { display: block; text-align: center; padding: 0.6rem 0.25rem; cursor: pointer; font-weight: 600; }
+      .seg input:checked + span { background: var(--graphite); color: var(--white); }
+      .seg input:focus-visible + span { outline: 3px solid var(--amber); outline-offset: -3px; }
+      .hint { font-size: 0.88rem; color: var(--soft); margin: 0.5rem 0 0; }
+      .check { display: flex; align-items: center; gap: 0.6rem; font-weight: 500; }
+      .check input { width: 1.15rem; height: 1.15rem; accent-color: var(--teal); }
+
+      .result { background: var(--steel); border: 1px solid var(--line); padding: clamp(1.25rem, 3vw, 2rem); }
+      .r-kicker { margin: 0 0 0.25rem; color: var(--teal); font-weight: 700; }
+      .result h3 { font-size: clamp(1.6rem, 3vw, 2.3rem); }
+      .r-body { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.5rem; align-items: center; margin-top: 1rem; }
+      .r-body svg { width: 100%; height: auto; background: var(--white); border: 1px solid var(--line); }
+      .r-stats { display: grid; gap: 0.9rem; }
+      .meter span { font-weight: 600; font-size: 0.95rem; }
+      .bar { height: 12px; background: var(--white); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin: 0.3rem 0 0.15rem; }
+      .bar i { display: block; height: 100%; background: var(--teal); transition: width 0.3s ease; }
+      @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+      .meter small { color: var(--soft); }
+      .fire { margin: 0; }
+      .r-price { margin: 0; font-size: 2.2rem; font-weight: 800; font-stretch: 125%; line-height: 1; }
+      .alts { margin: 1.25rem 0 0; color: var(--soft); font-size: 0.95rem; }
+
+      .table-wrap { overflow-x: auto; background: var(--white); border: 1px solid var(--line); }
+      table { width: 100%; border-collapse: collapse; min-width: 52rem; }
+      thead th { text-align: left; background: var(--graphite); color: var(--white); padding: 0; font-weight: 600; font-size: 0.92rem; }
+      thead th button, thead th:not(:has(button)) { display: block; width: 100%; padding: 0.8rem 1rem; }
+      thead th button { background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+      thead th button::after { content: '⇅'; opacity: 0.4; margin-left: 0.35rem; }
+      th[aria-sort='ascending'] button::after { content: '↑'; opacity: 1; }
+      th[aria-sort='descending'] button::after { content: '↓'; opacity: 1; }
+      tbody th, tbody td { text-align: left; padding: 0.85rem 1rem; border-top: 1px solid var(--line); font-weight: 400; }
+      tbody tr:hover { background: #f6f8f9; }
+      .m-id { font-weight: 800; font-stretch: 125%; color: var(--teal); margin-right: 0.25rem; }
+      .price { font-weight: 700; white-space: nowrap; }
+
+      .delivery { background: var(--white); }
+      .del-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+      .steps { list-style: none; margin: 0; padding: 0; counter-reset: s; display: grid; gap: 0; }
+      .steps li { counter-increment: s; display: grid; grid-template-columns: 3.5rem 1fr; gap: 0 1rem; padding: 1.1rem 0; border-top: 1px solid var(--line); }
+      .steps li::before { content: counter(s); grid-row: span 2; font-size: 2.4rem; font-weight: 800; font-stretch: 125%; color: var(--teal); line-height: 1; }
+      .steps h3 { font-size: 1.25rem; font-stretch: 112%; }
+      .steps p { margin: 0.25rem 0 0; color: var(--soft); }
+      .estimate { display: grid; gap: 0.85rem; background: var(--steel); border: 1px solid var(--line); border-top: 4px solid var(--amber); padding: 1.5rem; }
+      .estimate h3 { font-size: 1.4rem; font-stretch: 112%; }
+      .estimate label:not(.check), .q-grid label { display: grid; gap: 0.3rem; font-weight: 600; font-size: 0.95rem; }
+      select, input:not([type='checkbox']):not([type='radio']):not([type='range']), textarea { font: inherit; font-weight: 400; padding: 0.6rem 0.75rem; border: 1.5px solid var(--line); border-radius: 4px; background: var(--white); color: var(--graphite); }
+      .est-total { display: flex; justify-content: space-between; align-items: baseline; margin: 0.25rem 0 0; padding-top: 0.75rem; border-top: 1px solid var(--line); }
+      .est-total strong { font-size: 2rem; font-weight: 800; font-stretch: 125%; }
+
+      .dealers { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: center; background: var(--teal); color: var(--white); }
+      .dealers h2 { font-size: clamp(1.9rem, 4vw, 2.9rem); max-width: 16ch; }
+      .dealers p { max-width: 54ch; color: #cfe0e5; }
+      .dealer-facts { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; background: rgba(255,255,255,.2); }
+      .dealer-facts li { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 1rem 1.25rem; background: var(--teal); }
+      .dealer-facts strong { font-size: 1.6rem; font-weight: 800; font-stretch: 125%; }
+      .dealer-facts span { color: #cfe0e5; }
+
+      .quote { display: grid; place-items: center; }
+      .quote-form { width: min(100%, 46rem); display: grid; gap: 1rem; }
+      .quote-form h2 { font-size: clamp(2rem, 4.6vw, 3.3rem); }
+      .quote-form p { margin: 0; color: var(--soft); }
+      .q-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+      .q-grid .full { grid-column: 1 / -1; }
+      .ok { padding: 0.75rem 1rem; background: #e3f0ea; color: #1d4d36 !important; border-left: 4px solid #2f7a55; }
+
+      .foot { padding: 2rem clamp(1rem, 4vw, 3rem) 4.5rem; background: var(--graphite); color: #b9c2ca; font-size: 0.95rem; }
+      .foot p { margin: 0 0 0.25rem; }
+
+      @media (max-width: 960px) {
+        .hero, .finder-grid, .del-grid, .dealers { grid-template-columns: 1fr; }
+        nav { display: none; }
+        .top .btn { margin-left: auto; }
+      }
+      @media (max-width: 560px) {
+        .r-body, .q-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </body>
+</html>

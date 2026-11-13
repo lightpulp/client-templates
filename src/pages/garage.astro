@@ -1,0 +1,391 @@
+---
+import '@fontsource-variable/big-shoulders/opsz.css';
+import '@fontsource-variable/work-sans';
+import DemoBadge from '../components/DemoBadge.astro';
+
+const brand = { name: 'Redline Garage', town: 'Mabalacat, Pampanga', phone: '0917 000 0000', messenger: 'https://m.me/yourpage' };
+
+const menu = [
+  { tab: 'Maintenance', items: [
+    { id: 'pms', name: 'Preventive maintenance (PMS)', from: 3500, hrs: 2 },
+    { id: 'oil', name: 'Oil and filter change', from: 1800, hrs: 1 },
+    { id: 'brakes', name: 'Brake pads and rotor resurfacing', from: 2800, hrs: 2 },
+    { id: 'aircon', name: 'Aircon cleaning and recharge', from: 3200, hrs: 3 },
+  ] },
+  { tab: 'Performance', items: [
+    { id: 'tune', name: 'ECU tune and dyno run', from: 18000, hrs: 6 },
+    { id: 'intake', name: 'Intake and exhaust install', from: 6500, hrs: 4 },
+    { id: 'coil', name: 'Coilover install and alignment', from: 7500, hrs: 5 },
+    { id: 'bbk', name: 'Big brake kit install', from: 9000, hrs: 5 },
+  ] },
+  { tab: 'Body and paint', items: [
+    { id: 'dent', name: 'Dent repair, per panel', from: 3000, hrs: 4 },
+    { id: 'panel', name: 'Panel repaint, per panel', from: 6500, hrs: 16 },
+    { id: 'full', name: 'Full respray', from: 85000, hrs: 120 },
+    { id: 'wrap', name: 'Full vinyl wrap', from: 65000, hrs: 40 },
+  ] },
+  { tab: 'Detailing', items: [
+    { id: 'wash', name: 'Detail wash and interior vacuum', from: 900, hrs: 1 },
+    { id: 'correct', name: 'Paint correction, 1 step', from: 8000, hrs: 8 },
+    { id: 'ceramic', name: 'Ceramic coating, 3 years', from: 18000, hrs: 16 },
+    { id: 'tint', name: 'Window tint, full car', from: 7000, hrs: 4 },
+  ] },
+];
+const builds = [
+  { title: 'Civic EK street build', specs: [['Engine', 'B18C swap, tuned on our dyno'], ['Suspension', 'Coilovers, rear sway bar'], ['Wheels', '15 x 8 bronze, 195/50 tires']], time: '6 weeks' },
+  { title: 'Hilux overland setup', specs: [['Lift', '2 inch with long-travel shocks'], ['Armor', 'Steel bumper, rock sliders'], ['Extras', 'Roof rack, auxiliary lights']], time: '3 weeks' },
+  { title: 'Vios full respray', specs: [['Paint', 'Factory color, two-stage clear'], ['Body', '4 dents pulled, rust repaired'], ['Finish', 'Ceramic coating']], time: '2 weeks' },
+];
+const peso = (n: number) => '₱' + n.toLocaleString('en-PH');
+
+const car = (after: boolean) => `
+  <ellipse cx="300" cy="212" rx="250" ry="10" fill="#000" opacity=".18"/>
+  <g transform="translate(0 ${after ? 8 : 0})">
+    <path class="body" fill="${after ? '#FFC72C' : '#9DA1A6'}" d="M40 170V150Q42 132 70 126L150 112Q180 80 230 70L360 66Q400 66 440 100L520 112Q556 118 560 140L562 170Z"/>
+    ${after
+      ? '<path d="M152 112L232 70H250L172 112Z M182 112L262 70H280L202 112Z" fill="#1C1F22"/><path d="M40 160H562" stroke="#1C1F22" stroke-width="6"/>'
+      : '<ellipse cx="96" cy="150" rx="16" ry="7" fill="#8B4A2B" opacity=".8"/><ellipse cx="500" cy="146" rx="12" ry="6" fill="#8B4A2B" opacity=".8"/><ellipse cx="330" cy="152" rx="20" ry="5" fill="#7d8186"/>'}
+    <path d="M180 112Q200 86 236 80L300 78V112Z M312 78H356Q384 80 410 108L312 112Z" fill="${after ? '#1C1F22' : '#5d6267'}" opacity="${after ? 1 : 0.9}"/>
+    <path d="M110 170A40 40 0 0 1 190 170Z M420 170A40 40 0 0 1 500 170Z" fill="#1C1F22"/>
+    <rect x="540" y="132" width="16" height="8" rx="2" fill="${after ? '#fff' : '#d8d8d0'}"/>
+    <rect x="42" y="134" width="12" height="8" rx="2" fill="${after ? '#D7263D' : '#b9675e'}"/>
+  </g>
+  ${[150, 460].map((cx) => `
+    <g transform="translate(${cx} ${after ? 180 : 174})">
+      <circle r="${after ? 36 : 33}" fill="#1C1F22"/>
+      ${after
+        ? `<circle r="25" fill="#2a2e33"/><path d="M-14 -8A16 16 0 0 1 -2 -16" stroke="#D7263D" stroke-width="7" fill="none"/>${[0, 36, 72, 108, 144].map((a) => `<line x1="0" y1="0" x2="${(Math.cos((a * Math.PI) / 180) * 23).toFixed(1)}" y2="${(Math.sin((a * Math.PI) / 180) * 23).toFixed(1)}" stroke="#c9ccd1" stroke-width="4"/><line x1="0" y1="0" x2="${(-Math.cos((a * Math.PI) / 180) * 23).toFixed(1)}" y2="${(-Math.sin((a * Math.PI) / 180) * 23).toFixed(1)}" stroke="#c9ccd1" stroke-width="4"/>`).join('')}<circle r="5" fill="#FFC72C"/>`
+        : `<circle r="19" fill="#8c9095"/>${[0, 90, 180, 270].map((a) => `<circle cx="${(Math.cos((a * Math.PI) / 180) * 11).toFixed(1)}" cy="${(Math.sin((a * Math.PI) / 180) * 11).toFixed(1)}" r="3" fill="#5d6267"/>`).join('')}<circle r="4" fill="#5d6267"/>`}
+    </g>`).join('')}
+`;
+---
+<!doctype html>
+<html lang="en" data-default-brand={brand.name}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{brand.name} | Repairs, tuning and custom builds</title>
+    <meta name="description" content={`${brand.name} in ${brand.town}: maintenance, performance tuning, body and paint, detailing. Book a bay online.`} />
+    <meta name="theme-color" content="#FFC72C" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="logo" href="#top" data-brand>{brand.name}</a>
+      <nav aria-label="Main">
+        <a href="#services">Services</a>
+        <a href="#builds">Builds</a>
+        <a href="#book">Book a bay</a>
+        <a href="#visit">Visit</a>
+      </nav>
+      <a class="btn btn-dark" href="#book">Book a bay</a>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <h1>Repairs, tuning and full builds under one roof</h1>
+        <div class="compare" id="compare" style="--pos: 50%">
+          <svg class="layer before" viewBox="0 0 600 240" role="img" aria-label="Car before the build: primer grey, rust spots, steel wheels" set:html={car(false)} />
+          <svg class="layer after" viewBox="0 0 600 240" role="img" aria-label="Car after the build: yellow paint, stripes, lowered on new wheels" set:html={car(true)} />
+          <span class="tag tag-before">Before</span>
+          <span class="tag tag-after">After</span>
+          <span class="handle" aria-hidden="true"></span>
+          <input type="range" min="0" max="100" value="50" aria-label="Drag to compare before and after" id="compare-range" />
+        </div>
+        <div class="hero-foot">
+          <p>From oil changes to engine swaps. You get a written quote before we touch the car, and photos of every step on Messenger.</p>
+          <a class="btn btn-dark" href="#book">Book a bay</a>
+          <a class="btn btn-line" href="#services">See prices</a>
+        </div>
+      </section>
+
+      <section id="services" class="services">
+        <h2>Service menu</h2>
+        <p class="lede">Starting prices for most cars. Bigger engines and imports may cost more, and we tell you before we start.</p>
+        <div class="tabs" role="tablist" aria-label="Service categories">
+          {menu.map((m, i) => (
+            <button type="button" role="tab" id={`tab-${i}`} aria-controls={`panel-${i}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>{m.tab}</button>
+          ))}
+        </div>
+        {menu.map((m, i) => (
+          <ul class="menu" role="tabpanel" id={`panel-${i}`} aria-labelledby={`tab-${i}`} hidden={i !== 0}>
+            {m.items.map((it) => (
+              <li><span class="m-name">{it.name}</span><span class="m-time">{it.hrs < 8 ? `About ${it.hrs} hr` : `About ${Math.ceil(it.hrs / 8)} day${it.hrs > 8 ? 's' : ''}`}</span><span class="m-price">from {peso(it.from)}</span></li>
+            ))}
+          </ul>
+        ))}
+      </section>
+
+      <section id="book" class="book">
+        <h2>Book a bay</h2>
+        <p class="lede">Pick what your car needs. You'll see a time and price range before you send the request.</p>
+        <form class="book-grid" id="book-form">
+          <div class="book-left">
+            <fieldset class="vehicle">
+              <legend>Your car</legend>
+              <label>Make <input name="make" required placeholder="Toyota" /></label>
+              <label>Model <input name="model" required placeholder="Vios" /></label>
+              <label>Year <input name="year" inputmode="numeric" placeholder="2019" maxlength="4" /></label>
+            </fieldset>
+            <fieldset>
+              <legend>What does it need?</legend>
+              <div class="svc-pick">
+                {menu.map((m) => (
+                  <div>
+                    <p class="svc-group">{m.tab}</p>
+                    {m.items.map((it) => (
+                      <label class="svc"><input type="checkbox" name="svc" value={it.id} data-from={it.from} data-hrs={it.hrs} data-name={it.name} /><span>{it.name}</span></label>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+
+          <aside class="ticket">
+            <h3>Job ticket</h3>
+            <ul id="t-list"><li class="t-empty">Nothing picked yet.</li></ul>
+            <div class="t-row"><span>Estimated time</span><strong id="t-time">—</strong></div>
+            <div class="t-row"><span>Estimated price</span><strong id="t-price">—</strong></div>
+            <label>Drop-off day <input type="date" name="day" required /></label>
+            <label>Drop-off time
+              <select name="time"><option>8:00 AM</option><option>9:00 AM</option><option>10:00 AM</option><option>1:00 PM</option></select>
+            </label>
+            <label>Mobile number <input name="tel" required inputmode="tel" autocomplete="tel" /></label>
+            <button class="btn btn-yellow" type="submit">Request a bay</button>
+            <p class="t-ok" id="t-ok" hidden></p>
+          </aside>
+        </form>
+      </section>
+
+      <section id="builds" class="builds">
+        <h2>Recent builds</h2>
+        <ul class="build-list">
+          {builds.map((b) => (
+            <li>
+              <div class="b-photo" role="img" aria-label={`${b.title} photo placeholder`}></div>
+              <h3>{b.title}</h3>
+              <dl>{b.specs.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+              <p class="b-time">In the shop for {b.time}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="process">
+        <h2>How a job goes</h2>
+        <ol>
+          <li><h3>Inspect</h3><p>We check the car with you and list what we find, with photos.</p></li>
+          <li><h3>Quote</h3><p>A written quote for parts and labor. Nothing starts until you say yes.</p></li>
+          <li><h3>Work</h3><p>Progress photos on Messenger. Extra issues are quoted before we fix them.</p></li>
+          <li><h3>Hand over</h3><p>A test drive together, old parts returned, and a 30-day workmanship warranty.</p></li>
+        </ol>
+      </section>
+
+      <section id="visit" class="visit">
+        <h2>Find the shop</h2>
+        <div class="visit-grid">
+          <p><strong>Address</strong>Your street address, {brand.town}</p>
+          <p><strong>Hours</strong>Monday to Saturday, 8 AM to 6 PM</p>
+          <p><strong>Contact</strong><a href={`tel:${brand.phone.replace(/\s/g, '')}`}>{brand.phone}</a>, <a href={brand.messenger}>Messenger</a></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot"><p>&copy; <span data-brand>{brand.name}</span>. All work covered by a 30-day workmanship warranty.</p></footer>
+    <DemoBadge />
+
+    <script>
+      // Before / after slider
+      const compare = document.getElementById('compare')!;
+      const range = document.getElementById('compare-range') as HTMLInputElement;
+      range.addEventListener('input', () => compare.style.setProperty('--pos', range.value + '%'));
+
+      // Tabs
+      const tabs = [...document.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+      const select = (t: HTMLButtonElement) => {
+        tabs.forEach((x) => {
+          const on = x === t;
+          x.setAttribute('aria-selected', String(on));
+          x.tabIndex = on ? 0 : -1;
+          document.getElementById(x.getAttribute('aria-controls')!)!.hidden = !on;
+        });
+      };
+      tabs.forEach((t, i) => {
+        t.addEventListener('click', () => select(t));
+        t.addEventListener('keydown', (e) => {
+          const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+          if (!d) return;
+          const n = tabs[(i + d + tabs.length) % tabs.length];
+          select(n);
+          n.focus();
+        });
+      });
+
+      // Job ticket
+      const form = document.getElementById('book-form') as HTMLFormElement;
+      const peso = (n: number) => '₱' + (Math.round(n / 100) * 100).toLocaleString('en-PH');
+      const day = form.elements.namedItem('day') as HTMLInputElement;
+      const t = new Date(); t.setDate(t.getDate() + 1);
+      day.min = day.value = new Date(t.getTime() - t.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+
+      function ticket() {
+        const picked = [...form.querySelectorAll<HTMLInputElement>('input[name=svc]:checked')];
+        const list = document.getElementById('t-list')!;
+        list.innerHTML = picked.length ? '' : '<li class="t-empty">Nothing picked yet.</li>';
+        picked.forEach((p) => {
+          const li = document.createElement('li');
+          li.textContent = p.dataset.name!;
+          list.append(li);
+        });
+        const hrs = picked.reduce((s, p) => s + Number(p.dataset.hrs), 0);
+        const from = picked.reduce((s, p) => s + Number(p.dataset.from), 0);
+        document.getElementById('t-time')!.textContent = !hrs ? '—' : hrs <= 8 ? 'Ready the same day' : `About ${Math.ceil(hrs / 8)} working days`;
+        document.getElementById('t-price')!.textContent = from ? `${peso(from)} to ${peso(from * 1.35)}` : '—';
+        document.getElementById('t-ok')!.hidden = true;
+        return { picked, hrs, from };
+      }
+      form.addEventListener('input', ticket);
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const { picked } = ticket();
+        const ok = document.getElementById('t-ok')!;
+        ok.hidden = false;
+        if (!picked.length) { ok.textContent = 'Pick at least one service so we know how long to keep the bay.'; ok.classList.add('warn'); return; }
+        ok.classList.remove('warn');
+        const d = new FormData(form);
+        ok.textContent = `Bay requested for your ${d.get('make')} ${d.get('model')} on ${d.get('day')} at ${d.get('time')}. We'll text you to confirm.`;
+      });
+      ticket();
+    </script>
+
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      :root {
+        --yellow: #ffc72c;
+        --carbon: #1c1f22;
+        --primer: #a7abb0;
+        --paper: #f4f4f2;
+        --red: #d7263d;
+        --soft: #555b62;
+        --display: 'Big Shoulders Variable', 'Arial Narrow', sans-serif;
+        --text: 'Work Sans Variable', system-ui, sans-serif;
+      }
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      body { margin: 0; background: var(--paper); color: var(--carbon); font: 400 1.0625rem/1.55 var(--text); }
+      h1, h2, h3 { font-family: var(--display); font-weight: 900; margin: 0; line-height: 0.92; font-variation-settings: 'opsz' 72; }
+      a { color: inherit; }
+      :focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+    </style>
+
+    <style>
+      .top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 1.5rem; padding: 0.75rem clamp(1rem, 4vw, 3rem); background: var(--carbon); color: var(--paper); }
+      .logo { font: 900 1.7rem/1 var(--display); text-decoration: none; color: var(--yellow); font-variation-settings: 'opsz' 72; }
+      nav { display: flex; gap: 1.4rem; margin-left: auto; }
+      nav a { text-decoration: none; opacity: 0.8; font-weight: 500; }
+      nav a:hover { opacity: 1; }
+
+      .btn { display: inline-block; padding: 0.85rem 1.3rem; font: 700 1rem/1 var(--text); text-decoration: none; cursor: pointer; border: 2px solid var(--carbon); text-align: center; }
+      .btn-dark { background: var(--carbon); color: var(--yellow); }
+      .top .btn-dark { background: var(--yellow); color: var(--carbon); border-color: var(--yellow); }
+      .btn-line { background: transparent; }
+      .btn-line:hover { background: var(--carbon); color: var(--yellow); }
+      .btn-yellow { background: var(--yellow); color: var(--carbon); border-color: var(--yellow); width: 100%; }
+      .btn-yellow:hover { background: #ffd65e; }
+
+      section { padding: clamp(3rem, 7vw, 5.5rem) clamp(1rem, 4vw, 3rem); }
+      h2 { font-size: clamp(2.8rem, 7vw, 5rem); }
+      .lede { color: var(--soft); max-width: 56ch; margin: 0.9rem 0 2rem; }
+
+      .hero { background: var(--yellow); padding-bottom: clamp(2.5rem, 5vw, 4rem); }
+      .hero h1 { font-size: clamp(3.4rem, 10vw, 8.5rem); max-width: 12ch; }
+      .compare { position: relative; max-width: 62rem; margin: clamp(1.5rem, 4vw, 2.5rem) auto; aspect-ratio: 600 / 240; max-height: 60vh; background: linear-gradient(180deg, var(--yellow) 75%, #e6b324 75%); }
+      .layer { position: absolute; inset: 0; width: 100%; height: 100%; }
+      .after { clip-path: inset(0 0 0 var(--pos)); background: linear-gradient(180deg, var(--yellow) 75%, #d9a81c 75%); }
+      .handle { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 4px; margin-left: -2px; background: var(--carbon); pointer-events: none; }
+      .handle::after { content: '⇆'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--carbon); color: var(--yellow); font-size: 1.3rem; }
+      .compare input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
+      .compare input:focus-visible ~ .handle, .compare:has(input:focus-visible) .handle { background: var(--red); }
+      .tag { position: absolute; top: 0; font: 800 1.2rem/1 var(--display); padding: 0.35rem 0.6rem; background: var(--carbon); color: var(--paper); }
+      .tag-before { left: 0; }
+      .tag-after { right: 0; background: var(--paper); color: var(--carbon); }
+      .hero-foot { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+      .hero-foot p { flex: 1 1 26rem; max-width: 52ch; margin: 0 1rem 0 0; font-size: 1.1rem; }
+
+      .services { max-width: 76rem; margin: 0 auto; }
+      .tabs { display: flex; gap: 0; border-bottom: 3px solid var(--carbon); overflow-x: auto; }
+      .tabs button { font: 800 1.35rem/1 var(--display); padding: 0.75rem 1.25rem; background: none; border: 0; cursor: pointer; color: var(--soft); white-space: nowrap; font-variation-settings: 'opsz' 72; }
+      .tabs button[aria-selected='true'] { background: var(--carbon); color: var(--yellow); }
+      .menu { list-style: none; margin: 0; padding: 0; }
+      .menu li { display: grid; grid-template-columns: 1fr auto 9rem; gap: 1.5rem; align-items: baseline; padding: 1rem 0.25rem; border-bottom: 1px solid #d3d5d6; }
+      .m-name { font-weight: 600; font-size: 1.1rem; }
+      .m-time { color: var(--soft); font-size: 0.95rem; }
+      .m-price { font: 800 1.5rem/1 var(--display); text-align: right; font-variation-settings: 'opsz' 72; }
+
+      .book { background: var(--carbon); color: var(--paper); }
+      .book .lede { color: #b9bec3; }
+      .book-grid { display: grid; grid-template-columns: minmax(0, 1fr) 21rem; gap: 2.5rem; align-items: start; }
+      fieldset { border: 0; padding: 0; margin: 0 0 2rem; }
+      legend { font: 800 1.6rem/1 var(--display); color: var(--yellow); margin-bottom: 1rem; font-variation-settings: 'opsz' 72; }
+      .vehicle { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 7rem; gap: 0.75rem; }
+      .vehicle legend { grid-column: 1 / -1; }
+      label { display: grid; gap: 0.3rem; font-weight: 500; font-size: 0.95rem; }
+      input:not([type='checkbox']):not([type='range']), select { width: 100%; min-width: 0; font: inherit; padding: 0.6rem 0.75rem; border: 2px solid #3b4046; background: #272b2f; color: var(--paper); border-radius: 0; }
+      .svc-pick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 2rem; }
+      .svc-group { margin: 0 0 0.5rem; font-weight: 700; color: var(--primer); }
+      .svc { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.45rem 0; font-weight: 400; cursor: pointer; }
+      .svc input { width: 1.15rem; height: 1.15rem; accent-color: var(--yellow); margin-top: 0.2rem; }
+
+      .ticket { position: sticky; top: 5rem; display: grid; gap: 0.85rem; background: var(--paper); color: var(--carbon); padding: 1.5rem; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), 95% 100%, 90% calc(100% - 14px), 85% 100%, 80% calc(100% - 14px), 75% 100%, 70% calc(100% - 14px), 65% 100%, 60% calc(100% - 14px), 55% 100%, 50% calc(100% - 14px), 45% 100%, 40% calc(100% - 14px), 35% 100%, 30% calc(100% - 14px), 25% 100%, 20% calc(100% - 14px), 15% 100%, 10% calc(100% - 14px), 5% 100%, 0 calc(100% - 14px)); padding-bottom: 2.25rem; }
+      .ticket h3 { font-size: 2rem; border-bottom: 3px solid var(--carbon); padding-bottom: 0.5rem; }
+      .ticket ul { margin: 0; padding-left: 1.1rem; }
+      .ticket :global(.t-empty) { list-style: none; margin-left: -1.1rem; color: var(--soft); }
+      .t-row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; border-top: 1px dashed #a9adb1; padding-top: 0.6rem; }
+      .t-row strong { font: 800 1.35rem/1.1 var(--display); text-align: right; font-variation-settings: 'opsz' 72; }
+      .ticket input:not([type='checkbox']), .ticket select { background: #fff; color: var(--carbon); border-color: #c9cccf; }
+      .t-ok { margin: 0; padding: 0.75rem; background: #e6f2e2; border-left: 4px solid #3e7a2f; font-size: 0.95rem; }
+      .t-ok.warn { background: #fde8ea; border-color: var(--red); }
+
+      .builds { max-width: 82rem; margin: 0 auto; }
+      .build-list { list-style: none; margin: 2rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem; }
+      .b-photo { aspect-ratio: 4 / 3; background: linear-gradient(135deg, var(--primer), #6f747a); margin-bottom: 1rem; border-bottom: 6px solid var(--yellow); }
+      .build-list h3 { font-size: 2rem; margin-bottom: 0.75rem; }
+      .build-list dl { margin: 0; }
+      .build-list dl div { display: grid; grid-template-columns: 6.5rem 1fr; gap: 0.75rem; padding: 0.4rem 0; border-top: 1px solid #d3d5d6; }
+      .build-list dt { font-weight: 700; }
+      .build-list dd { margin: 0; color: var(--soft); }
+      .b-time { margin: 0.75rem 0 0; font-weight: 600; }
+
+      .process { background: var(--yellow); }
+      .process ol { list-style: none; margin: 2rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; counter-reset: s; }
+      .process li { counter-increment: s; border-top: 4px solid var(--carbon); padding-top: 0.75rem; }
+      .process li::before { content: counter(s); font: 900 4rem/1 var(--display); display: block; font-variation-settings: 'opsz' 72; }
+      .process h3 { font-size: 1.8rem; margin: 0.25rem 0 0.5rem; }
+      .process p { margin: 0; }
+
+      .visit { max-width: 82rem; margin: 0 auto; }
+      .visit-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; margin-top: 1.5rem; }
+      .visit-grid p { margin: 0; font-size: 1.1rem; }
+      .visit-grid strong { display: block; font: 800 1.4rem/1.2 var(--display); font-variation-settings: 'opsz' 72; }
+
+      .foot { padding: 1.5rem 1rem 4.5rem; background: var(--carbon); color: #9aa0a6; text-align: center; font-size: 0.9rem; }
+      .foot p { margin: 0; }
+
+      @media (max-width: 960px) {
+        nav { display: none; }
+        .top .btn { margin-left: auto; }
+        .book-grid { grid-template-columns: minmax(0, 1fr); }
+        .ticket { position: static; }
+        .build-list, .visit-grid { grid-template-columns: 1fr; }
+        .process ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 600px) {
+        .svc-pick, .process ol { grid-template-columns: 1fr; }
+        .vehicle { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+        .menu li { grid-template-columns: 1fr auto; }
+        .m-time { grid-row: 2; }
+      }
+    </style>
+  </body>
+</html>

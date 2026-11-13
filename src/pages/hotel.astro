@@ -1,0 +1,390 @@
+---
+import '@fontsource/marcellus';
+import '@fontsource-variable/figtree';
+import DemoBadge from '../components/DemoBadge.astro';
+
+const brand = { name: 'Casa Maganda Hotel', town: 'San Fernando, Pampanga', phone: '0917 000 0000', messenger: 'https://m.me/yourpage' };
+
+const rooms = [
+  { id: 'queen', name: 'Deluxe Queen', size: '24 m²', bed: '1 queen bed', max: 2, weekday: 2800, weekend: 3300, left: 4, perks: ['City view', 'Rain shower', 'Work desk'] },
+  { id: 'twin', name: 'Deluxe Twin', size: '26 m²', bed: '2 single beds', max: 2, weekday: 2900, weekend: 3400, left: 2, perks: ['Pool view', 'Rain shower', 'Sofa'] },
+  { id: 'family', name: 'Family Room', size: '38 m²', bed: '1 queen and 2 single beds', max: 4, weekday: 4600, weekend: 5200, left: 3, perks: ['Pool view', 'Bathtub', 'Mini fridge'] },
+  { id: 'suite', name: 'Garden Suite', size: '45 m²', bed: '1 king bed and a daybed', max: 3, weekday: 6200, weekend: 7000, left: 1, perks: ['Private garden', 'Living room', 'Bathtub'] },
+];
+const amenities = [
+  ['Pool', 'Open 7 AM to 9 PM, with a shallow end for kids'],
+  ['Breakfast', 'Kapampangan and continental, included in every rate'],
+  ['Free Wi-Fi', 'Fast enough for video calls in every room'],
+  ['Parking', 'Free, gated, with a guard on duty at night'],
+  ['Airport pickup', 'From Clark International Airport, on request'],
+  ['Function hall', 'For up to 120 guests, with in-house catering'],
+];
+const nearby = [
+  ['SM City Pampanga', '10 min drive'],
+  ['Clark International Airport', '30 min drive'],
+  ['San Fernando Cathedral', '8 min drive'],
+  ['Clark Freeport restaurants', '25 min drive'],
+];
+---
+<!doctype html>
+<html lang="en" data-default-brand={brand.name}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{brand.name} | Rooms and rates in {brand.town}</title>
+    <meta name="description" content={`Stay at ${brand.name} in ${brand.town}. See room prices for your dates, with breakfast included.`} />
+    <meta name="theme-color" content="#24614F" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="logo" href="#top" data-brand>{brand.name}</a>
+      <nav aria-label="Main">
+        <a href="#stay">Rooms and rates</a>
+        <a href="#amenities">Amenities</a>
+        <a href="#events">Events</a>
+        <a href="#location">Location</a>
+      </nav>
+      <a class="btn btn-jade" href="#stay">Book a stay</a>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <h1>A quiet room, a good breakfast, ten minutes from everything</h1>
+          <p>A family-run hotel in {brand.town}, with a pool, a garden and Kapampangan breakfast every morning. Pick your dates and see the price for your whole stay.</p>
+          <a class="btn btn-jade" href="#stay">See prices for my dates</a>
+        </div>
+        <div class="window" aria-hidden="true">
+          <div class="view"><span>Your hotel photo</span></div>
+          <div class="shutter left">{Array.from({ length: 18 }, () => <i></i>)}</div>
+          <div class="shutter right">{Array.from({ length: 18 }, () => <i></i>)}</div>
+        </div>
+      </section>
+
+      <section id="stay" class="stay">
+        <form class="dates" id="dates">
+          <label>Check-in <input type="date" name="in" required /></label>
+          <label>Check-out <input type="date" name="out" required /></label>
+          <label>Adults
+            <select name="adults">{[1, 2, 3, 4].map((n) => <option selected={n === 2}>{n}</option>)}</select>
+          </label>
+          <label>Children
+            <select name="kids">{[0, 1, 2, 3].map((n) => <option>{n}</option>)}</select>
+          </label>
+          <p class="nights" id="nights" aria-live="polite"></p>
+        </form>
+
+        <div class="stay-grid">
+          <div>
+            <h2>Rooms for your dates</h2>
+            <p class="lede">Prices are for the whole stay and include breakfast for everyone in the room. Friday and Saturday nights cost a little more.</p>
+            <ul class="rooms" id="rooms">
+              {rooms.map((r, i) => (
+                <li class="room" data-id={r.id} data-max={r.max} data-weekday={r.weekday} data-weekend={r.weekend} data-name={r.name}>
+                  <div class="room-photo" role="img" aria-label={`${r.name} photo placeholder`}></div>
+                  <div class="room-info">
+                    <h3>{r.name}</h3>
+                    <p class="room-meta">{r.size}, {r.bed}, up to {r.max} guests</p>
+                    <ul class="perks">{r.perks.map((p) => <li>{p}</li>)}</ul>
+                    {r.left <= 2 && <p class="left">Only {r.left} left for these dates</p>}
+                  </div>
+                  <div class="room-price">
+                    <p class="from">From ₱{r.weekday.toLocaleString('en-PH')} a night</p>
+                    <p class="stay-total" data-total></p>
+                    <label class="choose"><input type="radio" name="room" value={r.id} checked={i === 0} /><span>Choose room</span></label>
+                    <p class="too-small" hidden>Too small for your group</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <aside class="bill" aria-live="polite">
+            <h3>Your stay</h3>
+            <p class="bill-room" id="bill-room"></p>
+            <p class="bill-dates" id="bill-dates"></p>
+            <dl id="bill-lines"></dl>
+            <p class="bill-total"><span>Total</span><strong id="bill-total"></strong></p>
+            <p class="small">Rates include VAT. Free cancellation up to 3 days before check-in.</p>
+            <form class="guest" id="guest">
+              <label>Full name <input name="who" required autocomplete="name" /></label>
+              <label>Mobile number <input name="tel" required inputmode="tel" autocomplete="tel" /></label>
+              <button class="btn btn-jade" type="submit">Request reservation</button>
+            </form>
+            <div class="sent" id="sent" hidden>
+              <p>Reservation request ready. Send it and the front desk will confirm your room and how to pay the deposit.</p>
+              <a class="btn btn-jade" id="sms">Send by text</a>
+              <a class="btn btn-line" href={brand.messenger}>Open Messenger</a>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="amenities" class="amenities">
+        <h2>Everything you'd want for a weekend</h2>
+        <dl class="am-list">
+          {amenities.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+        </dl>
+      </section>
+
+      <section id="events" class="events">
+        <div class="events-photo" role="img" aria-label="Function hall photo placeholder"></div>
+        <div>
+          <h2>Birthdays, weddings and reunions</h2>
+          <p>Our function hall seats up to 120 guests, with Kapampangan catering from our own kitchen, sound system and a room for the celebrant. Packages start at ₱650 per guest.</p>
+          <a class="btn btn-line" href={brand.messenger}>Ask about your event date</a>
+        </div>
+      </section>
+
+      <section class="words">
+        <h2>From our guests</h2>
+        <ul>
+          <li><blockquote>“The breakfast alone was worth it. The staff remembered our names by the second day.”</blockquote><p>Guest name, Quezon City</p></li>
+          <li><blockquote>“Quiet, clean and close to SM. We stay here every time we visit family.”</blockquote><p>Guest name, Cebu</p></li>
+          <li><blockquote>“We held my mother's 70th in the hall. Everything ran on time.”</blockquote><p>Guest name, Angeles City</p></li>
+        </ul>
+      </section>
+
+      <section id="location" class="location">
+        <div>
+          <h2>Getting here</h2>
+          <address>Your street address<br />{brand.town}</address>
+          <ul class="nearby">{nearby.map(([p, t]) => <li><span>{p}</span><span>{t}</span></li>)}</ul>
+          <p class="small">Check-in from 2 PM, check-out by 12 noon.</p>
+          <p><a href={`tel:${brand.phone.replace(/\s/g, '')}`}>{brand.phone}</a></p>
+        </div>
+        <div class="map" role="img" aria-label="Map placeholder">Google Map goes here</div>
+      </section>
+    </main>
+
+    <footer class="foot"><p>&copy; <span data-brand>{brand.name}</span>, {brand.town}</p></footer>
+    <DemoBadge />
+
+    <script>
+      const peso = (n: number) => '₱' + Math.round(n).toLocaleString('en-PH');
+      const form = document.getElementById('dates') as HTMLFormElement;
+      const $ = (id: string) => document.getElementById(id)!;
+      const rooms = [...document.querySelectorAll<HTMLElement>('.room')];
+      const inEl = form.elements.namedItem('in') as HTMLInputElement;
+      const outEl = form.elements.namedItem('out') as HTMLInputElement;
+      const iso = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+      const today = new Date();
+      const add = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+      inEl.min = iso(today);
+      inEl.value = iso(add(today, 7));
+      outEl.value = iso(add(today, 9));
+      let last: { msg: string } = { msg: '' };
+
+      function nightsBetween() {
+        const a = new Date(inEl.value + 'T00:00'), b = new Date(outEl.value + 'T00:00');
+        const list: Date[] = [];
+        for (let d = a; d < b; d = add(d, 1)) list.push(d);
+        return list;
+      }
+
+      function update() {
+        outEl.min = inEl.value ? iso(add(new Date(inEl.value + 'T00:00'), 1)) : '';
+        const nights = nightsBetween();
+        const weekend = nights.filter((d) => d.getDay() === 5 || d.getDay() === 6).length;
+        const weekday = nights.length - weekend;
+        const guests = Number((form.elements.namedItem('adults') as HTMLSelectElement).value) + Number((form.elements.namedItem('kids') as HTMLSelectElement).value);
+        $('nights').textContent = nights.length ? `${nights.length} ${nights.length === 1 ? 'night' : 'nights'}, ${guests} ${guests === 1 ? 'guest' : 'guests'}` : 'Check-out must be after check-in.';
+        $('nights').classList.toggle('warn', !nights.length);
+
+        let chosen = document.querySelector<HTMLInputElement>('input[name=room]:checked');
+        rooms.forEach((r) => {
+          const fits = guests <= Number(r.dataset.max);
+          const radio = r.querySelector<HTMLInputElement>('input')!;
+          radio.disabled = !fits;
+          r.classList.toggle('no-fit', !fits);
+          r.querySelector<HTMLElement>('.too-small')!.hidden = fits;
+          const total = weekday * Number(r.dataset.weekday) + weekend * Number(r.dataset.weekend);
+          r.querySelector('[data-total]')!.textContent = nights.length ? `${peso(total)} for ${nights.length} ${nights.length === 1 ? 'night' : 'nights'}` : '';
+          r.classList.toggle('picked', radio.checked && fits);
+        });
+        if (chosen?.disabled) {
+          const first = rooms.find((r) => !r.classList.contains('no-fit'))?.querySelector('input');
+          if (first) { first.checked = true; chosen = first; update(); return; }
+        }
+        const room = chosen?.closest<HTMLElement>('.room');
+        if (!room || !nights.length) {
+          $('bill-room').textContent = nights.length ? 'Choose a room' : '';
+          $('bill-lines').innerHTML = '';
+          $('bill-total').textContent = '—';
+          return;
+        }
+        const wd = weekday * Number(room.dataset.weekday);
+        const we = weekend * Number(room.dataset.weekend);
+        const service = (wd + we) * 0.1;
+        const fmt = (d: Date) => d.toLocaleDateString('en-PH', { weekday: 'short', month: 'short', day: 'numeric' });
+        $('bill-room').textContent = room.dataset.name!;
+        $('bill-dates').textContent = `${fmt(new Date(inEl.value + 'T00:00'))} to ${fmt(new Date(outEl.value + 'T00:00'))}`;
+        const lines: [string, number][] = [];
+        if (weekday) lines.push([`${weekday} weeknight${weekday > 1 ? 's' : ''} × ${peso(Number(room.dataset.weekday))}`, wd]);
+        if (weekend) lines.push([`${weekend} Fri or Sat night${weekend > 1 ? 's' : ''} × ${peso(Number(room.dataset.weekend))}`, we]);
+        lines.push(['Breakfast for ' + guests, 0], ['Service charge, 10%', service]);
+        $('bill-lines').innerHTML = lines.map(([k, v]) => `<div><dt>${k}</dt><dd>${v ? peso(v) : 'Included'}</dd></div>`).join('');
+        const total = wd + we + service;
+        $('bill-total').textContent = peso(total);
+        $('sent').hidden = true;
+        last.msg = `Reservation request: ${room.dataset.name}, ${inEl.value} to ${outEl.value} (${nights.length} nights), ${guests} guests. Estimate ${peso(total)}.`;
+      }
+
+      $('stay').addEventListener('input', (e) => { if (!(e.target as HTMLElement).closest('#guest')) update(); });
+      form.addEventListener('submit', (e) => e.preventDefault());
+      ($('guest') as HTMLFormElement).addEventListener('submit', (e) => {
+        e.preventDefault();
+        const d = new FormData(e.target as HTMLFormElement);
+        ($('sms') as HTMLAnchorElement).href = `sms:?&body=${encodeURIComponent(`${last.msg}\nName: ${d.get('who')}\nMobile: ${d.get('tel')}`)}`;
+        $('sent').hidden = false;
+      });
+      update();
+    </script>
+
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      :root {
+        --white: #ffffff;
+        --mist: #eef3f0;
+        --narra: #3f2a1d;
+        --soft: #6b5a4d;
+        --jade: #24614f;
+        --abaca: #cdbb94;
+        --display: 'Marcellus', Georgia, serif;
+        --text: 'Figtree Variable', system-ui, sans-serif;
+      }
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      body { margin: 0; background: var(--white); color: var(--narra); font: 400 1.0625rem/1.6 var(--text); }
+      h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; line-height: 1.12; }
+      a { color: inherit; }
+      :focus-visible { outline: 2px solid var(--jade); outline-offset: 3px; }
+    </style>
+
+    <style>
+      .top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 2rem; padding: 0.9rem clamp(1rem, 4vw, 3rem); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(6px); border-bottom: 1px solid #e7e0d0; }
+      .logo { font: 400 1.4rem/1 var(--display); text-decoration: none; }
+      nav { display: flex; gap: 1.5rem; margin-left: auto; }
+      nav a { text-decoration: none; color: var(--soft); }
+      nav a:hover { color: var(--narra); }
+
+      .btn { display: inline-block; white-space: nowrap; padding: 0.8rem 1.4rem; border-radius: 999px; font: 600 1rem/1 var(--text); text-decoration: none; cursor: pointer; border: 1.5px solid var(--jade); text-align: center; }
+      .btn-jade { background: var(--jade); color: var(--white); }
+      .btn-jade:hover { background: #1b4c3e; }
+      .btn-line { color: var(--jade); background: transparent; }
+      .btn-line:hover { background: var(--jade); color: var(--white); }
+
+      section { padding: clamp(3rem, 7vw, 5.5rem) clamp(1rem, 4vw, 3rem); }
+      h2 { font-size: clamp(2rem, 4.2vw, 3rem); }
+      .lede { color: var(--soft); max-width: 56ch; margin: 0.75rem 0 1.75rem; }
+      .small { font-size: 0.88rem; color: var(--soft); }
+
+      .hero { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: center; max-width: 82rem; margin: 0 auto; }
+      .hero h1 { font-size: clamp(2.4rem, 5.4vw, 4.4rem); max-width: 15ch; }
+      .hero-copy p { font-size: 1.15rem; color: var(--soft); max-width: 46ch; margin: 1.5rem 0 2rem; }
+
+      /* Capiz window: two sliding panels of shell panes in a narra frame */
+      .window { position: relative; aspect-ratio: 4 / 5; border: 14px solid var(--narra); border-radius: 4px; overflow: hidden; background: var(--narra); box-shadow: 0 24px 50px -28px rgba(63, 42, 29, 0.7); }
+      .view { position: absolute; inset: 0; display: grid; place-items: end center; padding: 1.25rem; color: rgba(255, 255, 255, 0.85); font-size: 0.9rem;
+        background: linear-gradient(180deg, #f3c58b 0%, #e7a46a 30%, #9bc2b5 58%, #2f7c6a 100%); }
+      .shutter { position: absolute; top: 0; bottom: 0; width: 50%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(6, 1fr); gap: 6px; padding: 6px; background: var(--narra); animation-duration: 1.8s; animation-timing-function: cubic-bezier(.6, 0, .2, 1); animation-delay: 0.5s; animation-fill-mode: forwards; }
+      .shutter i { background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95), rgba(246, 239, 226, 0.88) 45%, rgba(226, 214, 192, 0.85)); }
+      .shutter.left { left: 0; animation-name: slide-left; }
+      .shutter.right { right: 0; animation-name: slide-right; }
+      @keyframes slide-left { to { transform: translateX(-72%); } }
+      @keyframes slide-right { to { transform: translateX(72%); } }
+      @media (prefers-reduced-motion: reduce) {
+        .shutter.left, .shutter.right { animation-name: none; }
+        .shutter.left { transform: translateX(-72%); }
+        .shutter.right { transform: translateX(72%); }
+      }
+
+      .stay { background: var(--mist); }
+      .dates { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; gap: 1rem; align-items: end; max-width: 82rem; margin: 0 auto 3rem; padding: 1.25rem; background: var(--white); border-radius: 16px; box-shadow: 0 10px 30px -18px rgba(36, 97, 79, 0.45); }
+      .dates label, .guest label { display: grid; gap: 0.3rem; font-weight: 600; font-size: 0.92rem; }
+      input, select { font: inherit; font-weight: 400; padding: 0.65rem 0.8rem; border: 1.5px solid #d9d1bf; border-radius: 10px; background: var(--white); color: var(--narra); }
+      .nights { margin: 0; padding: 0.65rem 0; font-weight: 600; color: var(--jade); white-space: nowrap; }
+      .nights.warn { color: #a63d1e; }
+
+      .stay-grid { display: grid; grid-template-columns: minmax(0, 1fr) 22rem; gap: 2.5rem; max-width: 82rem; margin: 0 auto; align-items: start; }
+      .rooms { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+      .room { display: grid; grid-template-columns: 11rem minmax(0, 1fr) 13rem; gap: 1.25rem; background: var(--white); border-radius: 16px; padding: 1rem; border: 2px solid transparent; }
+      .room.picked { border-color: var(--jade); }
+      .room.no-fit { opacity: 0.55; }
+      .room-photo { border-radius: 10px; min-height: 8rem; background: linear-gradient(160deg, #d8cdb5, #a99778); }
+      .room h3 { font-size: 1.5rem; }
+      .room-meta { margin: 0.25rem 0 0.5rem; color: var(--soft); font-size: 0.95rem; }
+      .perks { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+      .perks li { font-size: 0.85rem; padding: 0.2rem 0.6rem; background: var(--mist); border-radius: 999px; }
+      .left { margin: 0.6rem 0 0; color: #a63d1e; font-size: 0.9rem; font-weight: 600; }
+      .room-price { display: flex; flex-direction: column; justify-content: center; gap: 0.35rem; text-align: right; }
+      .room-price p { margin: 0; }
+      .from { color: var(--soft); font-size: 0.9rem; }
+      .stay-total { font: 400 1.35rem/1.2 var(--display); }
+      .choose input { position: absolute; opacity: 0; }
+      .choose span { display: inline-block; padding: 0.55rem 1rem; border-radius: 999px; border: 1.5px solid var(--jade); color: var(--jade); font-weight: 600; cursor: pointer; }
+      .choose input:checked + span { background: var(--jade); color: var(--white); }
+      .choose input:checked + span::before { content: '✓ '; }
+      .choose input:disabled + span { cursor: not-allowed; border-color: #b9b0a0; color: #8d8273; }
+      .choose input:focus-visible + span { outline: 2px solid var(--jade); outline-offset: 3px; }
+      .too-small { font-size: 0.85rem; color: #a63d1e; }
+
+      .bill { position: sticky; top: 5.5rem; background: var(--white); border-radius: 16px; padding: 1.5rem; border-top: 6px solid var(--abaca); }
+      .bill h3 { font-size: 1.6rem; }
+      .bill-room { margin: 0.5rem 0 0; font-weight: 700; }
+      .bill-dates { margin: 0 0 1rem; color: var(--soft); }
+      .bill dl { margin: 0; }
+      .bill :global(dl div) { display: flex; justify-content: space-between; gap: 1rem; padding: 0.45rem 0; border-bottom: 1px dashed #ddd3c0; font-size: 0.95rem; }
+      .bill :global(dd) { margin: 0; font-weight: 600; white-space: nowrap; }
+      .bill-total { display: flex; justify-content: space-between; align-items: baseline; margin: 1rem 0 0.25rem; }
+      .bill-total strong { font: 400 2.1rem/1 var(--display); color: var(--jade); }
+      .guest { display: grid; gap: 0.75rem; margin-top: 1rem; }
+      .sent { display: grid; gap: 0.5rem; margin-top: 1rem; padding: 1rem; background: var(--mist); border-radius: 12px; }
+      .sent p { margin: 0 0 0.25rem; }
+
+      .amenities { max-width: 82rem; margin: 0 auto; }
+      .am-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem 3rem; margin: 2.25rem 0 0; }
+      .am-list div { border-top: 1px solid var(--abaca); padding-top: 1rem; }
+      .am-list dt { font: 400 1.4rem/1.2 var(--display); }
+      .am-list dd { margin: 0.35rem 0 0; color: var(--soft); }
+
+      .events { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; background: var(--jade); color: var(--white); }
+      .events-photo { aspect-ratio: 16 / 10; border-radius: 16px; background: linear-gradient(135deg, #e9c78f, #b9854f 55%, #6b4a2c); }
+      .events p { color: #d6e7e0; max-width: 50ch; margin: 1rem 0 1.75rem; }
+      .events .btn-line { border-color: var(--white); color: var(--white); }
+      .events .btn-line:hover { background: var(--white); color: var(--jade); }
+
+      .words { max-width: 82rem; margin: 0 auto; }
+      .words ul { list-style: none; margin: 2rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
+      .words blockquote { margin: 0; font: 400 1.3rem/1.45 var(--display); }
+      .words p { margin: 0.75rem 0 0; color: var(--soft); font-size: 0.95rem; }
+
+      .location { display: grid; grid-template-columns: 1fr 1.2fr; gap: 2.5rem; background: var(--mist); }
+      address { font-style: normal; font-size: 1.15rem; margin: 1rem 0; }
+      .nearby { list-style: none; margin: 0 0 1rem; padding: 0; max-width: 26rem; }
+      .nearby li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #d9d1bf; }
+      .nearby li span:last-child { color: var(--soft); }
+      .map { min-height: 18rem; display: grid; place-items: center; color: var(--soft); border-radius: 16px; background: repeating-linear-gradient(45deg, #e2e9e5 0 2px, transparent 2px 22px), var(--white); }
+
+      .foot { padding: 1.5rem 1rem 4.5rem; text-align: center; color: var(--soft); font-size: 0.9rem; }
+      .foot p { margin: 0; }
+
+      @media (max-width: 1000px) {
+        .stay-grid { grid-template-columns: 1fr; }
+        .bill { position: static; }
+        .dates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .nights { grid-column: 1 / -1; }
+      }
+      @media (max-width: 760px) {
+        nav { display: none; }
+        .top .btn { margin-left: auto; }
+        .hero, .events, .location { grid-template-columns: 1fr; }
+        .window { max-width: 26rem; }
+        .room { grid-template-columns: 1fr; }
+        .room-price { text-align: left; }
+        .am-list, .words ul { grid-template-columns: 1fr; }
+      }
+    </style>
+  </body>
+</html>

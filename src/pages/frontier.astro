@@ -1,0 +1,364 @@
+---
+import '@fontsource/rye';
+import '@fontsource-variable/lora';
+import '@fontsource-variable/lora/wght-italic.css';
+import DemoBadge from '../components/DemoBadge.astro';
+
+const brand = { name: 'Frontier Gun Store', since: '1998', town: 'Angeles City, Pampanga', phone: '0917 000 0000', messenger: 'https://m.me/yourpage' };
+
+const counter = [
+  { name: 'Colt Python 6"', note: 'Pre-owned, excellent bore, box and papers', price: '₱145,000' },
+  { name: 'Rock Island 1911 Tactical', note: 'New, two magazines, hard case', price: '₱46,500' },
+  { name: 'Winchester Model 94', note: 'Pre-owned lever action, .30-30', price: '₱78,000' },
+];
+
+const steps = [
+  { title: 'Attend a gun safety seminar', detail: 'Required before you apply. We run one every Saturday at the shop and issue the certificate the same day.', bring: 'Valid ID' },
+  { title: 'Take the neuro-psychiatric test', detail: 'Done at an accredited clinic. We can point you to the nearest one.', bring: 'Valid ID, seminar certificate' },
+  { title: 'Take the drug test', detail: 'Done at an accredited drug testing center. Results usually come out in one day.', bring: 'Valid ID' },
+  { title: 'Get your police or NBI clearance', detail: 'Either clearance works if it is still valid when you apply.', bring: 'Valid IDs as required by the issuing office' },
+  { title: 'Prepare your documents', detail: 'Birth certificate, two valid IDs, proof of income and your test results. We check the full set before you file.', bring: 'Everything above in one folder' },
+  { title: 'File your LTOPF application', detail: 'Our desk helps you fill in and file the application so nothing comes back for corrections.', bring: 'Your document folder, application fee' },
+  { title: 'Register your first firearm', detail: 'Once your license is approved, we file the registration for the firearm you choose and release it to you.', bring: 'Your approved LTOPF' },
+];
+
+const services = {
+  Handguns: [
+    ['Basic cleaning and lube', '₱500'],
+    ['Deep clean, full strip', '₱1,200'],
+    ['Sight install', '₱800'],
+    ['Optic cut and mount', '₱6,500'],
+    ['Trigger job', '₱2,500'],
+  ],
+  'Rifles and shotguns': [
+    ['Basic cleaning and lube', '₱700'],
+    ['Scope mount and bore sight', '₱1,200'],
+    ['Stock refinish, wood', '₱4,000'],
+    ['Recoil pad fitting', '₱1,500'],
+    ['Function check and report', '₱600'],
+  ],
+};
+
+const seminars = [
+  { date: 'Saturday, December 6', time: '8 AM to 12 NN', seats: 6 },
+  { date: 'Saturday, December 13', time: '8 AM to 12 NN', seats: 11 },
+  { date: 'Saturday, December 20', time: '1 PM to 5 PM', seats: 2 },
+];
+---
+<!doctype html>
+<html lang="en" data-default-brand={brand.name}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{brand.name} | Firearms, gunsmithing and license help in {brand.town}</title>
+    <meta name="description" content={`${brand.name} has served shooters in ${brand.town} since ${brand.since}. Firearms, gunsmithing, and help with your LTOPF.`} />
+    <meta name="theme-color" content="#2F4454" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="mark" href="#top" data-brand>{brand.name}</a>
+      <nav aria-label="Main">
+        <a href="#counter">At the counter</a>
+        <a href="#license">License help</a>
+        <a href="#gunsmith">Gunsmith</a>
+        <a href="#seminars">Seminars</a>
+        <a href="#visit">Visit</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="poster">
+        <p class="since">Serving {brand.town} since {brand.since}</p>
+        <h1 data-brand>{brand.name}</h1>
+        <p class="ribbon">Firearms, gunsmithing and license help</p>
+        <p class="poster-lede">A family-run shop where you can handle the piece before you buy it, get it serviced by the same people who sold it, and get real help with your paperwork.</p>
+        <div class="poster-actions">
+          <a class="btn btn-red" href="#license">Start your license</a>
+          <a class="btn btn-plain" href="#counter">See what's in this week</a>
+        </div>
+      </section>
+
+      <section id="counter" class="counter">
+        <h2>At the counter this week</h2>
+        <p class="sec-lede">A few pieces worth coming in for. Ask about anything you see and we'll set it aside while you drive over.</p>
+        <ul class="tags">
+          {counter.map((c) => (
+            <li class="tag">
+              <div class="tag-photo" role="img" aria-label={`${c.name} photo placeholder`}></div>
+              <h3>{c.name}</h3>
+              <p>{c.note}</p>
+              <p class="tag-price">{c.price}</p>
+              <a href={brand.messenger}>Ask about this piece</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section id="license" class="license">
+        <div class="license-inner">
+          <div class="license-copy">
+            <h2>Your first license, one step at a time</h2>
+            <p class="sec-lede">Tick off each step as you finish it. Your progress stays on this phone, so you can come back anytime.</p>
+            <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+            <p class="progress-text" id="progress-text" aria-live="polite">0 of {steps.length} steps done</p>
+
+            <ol class="steps" id="steps">
+              {steps.map((s, i) => (
+                <li class="step">
+                  <label class="step-check">
+                    <input type="checkbox" data-step={i} />
+                    <span class="step-title">{s.title}</span>
+                  </label>
+                  <details>
+                    <summary>What to do</summary>
+                    <p>{s.detail}</p>
+                    <p><strong>Bring:</strong> {s.bring}</p>
+                  </details>
+                </li>
+              ))}
+            </ol>
+            <p class="disclaimer">Sample steps for illustration. The shop confirms the current PNP-FEO requirements with you before you file.</p>
+          </div>
+
+          <form class="session" id="session">
+            <h3>Book a license-help session</h3>
+            <p>One hour at our desk. We check your documents and help you file. ₱1,500, waived if you buy your first firearm here.</p>
+            <label>Name <input name="who" required autocomplete="name" /></label>
+            <label>Mobile number <input name="tel" required inputmode="tel" autocomplete="tel" /></label>
+            <label>Preferred day <input name="day" type="date" required /></label>
+            <label>Time
+              <select name="time">
+                <option>9:00 AM</option><option>10:30 AM</option><option>1:00 PM</option><option>2:30 PM</option><option>4:00 PM</option>
+              </select>
+            </label>
+            <button class="btn btn-red" type="submit">Book session</button>
+            <p class="done" id="session-done" hidden>Session requested. We'll text you to confirm the slot.</p>
+          </form>
+        </div>
+      </section>
+
+      <section id="gunsmith" class="gunsmith">
+        <h2>Gunsmith price board</h2>
+        <p class="sec-lede">Drop it off in the morning, pick it up the next day for most jobs. Prices are for labor; parts are quoted first.</p>
+        <div class="boards">
+          {Object.entries(services).map(([group, rows]) => (
+            <div class="board">
+              <h3>{group}</h3>
+              <ul>
+                {rows.map(([job, price]) => (
+                  <li><span class="job">{job}</span><span class="dots" aria-hidden="true"></span><span class="cost">{price}</span></li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="seminars" class="seminars">
+        <h2>Gun safety seminars</h2>
+        <p class="sec-lede">The certificate you need for your LTOPF. Four hours, classroom and range orientation, ₱1,000 per person.</p>
+        <ul class="sem-list">
+          {seminars.map((s) => (
+            <li>
+              <div>
+                <p class="sem-date">{s.date}</p>
+                <p class="sem-time">{s.time}</p>
+              </div>
+              <p class:list={['seats', { few: s.seats <= 3 }]}>{s.seats} {s.seats === 1 ? 'seat' : 'seats'} left</p>
+              <button type="button" class="btn btn-plain" data-seat={s.date}>Reserve a seat</button>
+            </li>
+          ))}
+        </ul>
+        <p class="done" id="seat-done" hidden></p>
+      </section>
+
+      <section class="story">
+        <div class="portrait" role="img" aria-label="Owner photo placeholder"></div>
+        <div>
+          <h2>Three generations behind the counter</h2>
+          <p>Your story goes here. Who started the shop, why, and what has stayed the same since. Customers trust a gun store that has a face and a history, so this is one of the most read parts of the site.</p>
+          <p class="sign">The family at <span data-brand>{brand.name}</span></p>
+        </div>
+      </section>
+
+      <section id="visit" class="visit">
+        <h2>Come by the shop</h2>
+        <div class="visit-grid">
+          <address>Your street address<br />{brand.town}</address>
+          <p>Monday to Saturday<br />9 AM to 6 PM</p>
+          <p><a href={`tel:${brand.phone.replace(/\s/g, '')}`}>{brand.phone}</a><br /><a href={brand.messenger}>Message us on Facebook</a></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>&copy; <span data-brand>{brand.name}</span>. Licensed firearms dealer. Firearms are released only to buyers with a valid LTOPF.</p>
+    </footer>
+
+    <DemoBadge />
+
+    <script>
+      const KEY = 'frontier-license-steps';
+      const boxes = [...document.querySelectorAll<HTMLInputElement>('[data-step]')];
+      const bar = document.getElementById('bar')!;
+      const text = document.getElementById('progress-text')!;
+      let saved: number[] = [];
+      try { saved = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch {}
+      boxes.forEach((b) => (b.checked = saved.includes(Number(b.dataset.step))));
+
+      function update() {
+        const done = boxes.filter((b) => b.checked).map((b) => Number(b.dataset.step));
+        try { localStorage.setItem(KEY, JSON.stringify(done)); } catch {}
+        bar.style.width = `${(done.length / boxes.length) * 100}%`;
+        text.textContent = done.length === boxes.length ? 'All steps done. Come pick up your firearm.' : `${done.length} of ${boxes.length} steps done`;
+        boxes.forEach((b) => b.closest('.step')!.classList.toggle('is-done', b.checked));
+      }
+      boxes.forEach((b) => b.addEventListener('change', update));
+      update();
+
+      const session = document.getElementById('session') as HTMLFormElement;
+      session.addEventListener('submit', (e) => {
+        e.preventDefault();
+        document.getElementById('session-done')!.hidden = false;
+      });
+
+      const seatDone = document.getElementById('seat-done')!;
+      document.querySelectorAll<HTMLButtonElement>('[data-seat]').forEach((b) =>
+        b.addEventListener('click', () => {
+          seatDone.hidden = false;
+          seatDone.textContent = `Seat held for ${b.dataset.seat}. Send us your name and number on Messenger to confirm.`;
+          b.textContent = 'Seat held';
+          b.disabled = true;
+        })
+      );
+    </script>
+
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      :root {
+        --bone: #f2ede3;
+        --ink: #2a1f17;
+        --oxblood: #7b2216;
+        --brass: #a9822f;
+        --denim: #2f4454;
+        --rule: #cdbfa8;
+        --soft: #6a5a4b;
+        --wood: 'Rye', Georgia, serif;
+        --serif: 'Lora Variable', Georgia, serif;
+      }
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      body { margin: 0; background: var(--bone); color: var(--ink); font: 400 1.0625rem/1.7 var(--serif); }
+      h1, h2 { font-family: var(--wood); font-weight: 400; line-height: 1.1; margin: 0; }
+      h3 { font-family: var(--serif); font-weight: 700; margin: 0; line-height: 1.25; }
+      a { color: var(--oxblood); }
+      :focus-visible { outline: 2px solid var(--oxblood); outline-offset: 3px; }
+    </style>
+
+    <style>
+      .top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem clamp(1rem, 4vw, 3rem); background: var(--denim); color: var(--bone); }
+      .mark { font: 400 1.25rem/1 var(--wood); color: var(--bone); text-decoration: none; }
+      nav { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+      nav a { color: #d9d2c4; text-decoration: none; font-size: 0.98rem; }
+      nav a:hover { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+
+      section { padding: clamp(3rem, 7vw, 5.5rem) clamp(1rem, 4vw, 3rem); }
+      h2 { font-size: clamp(2rem, 4.5vw, 3rem); }
+      .sec-lede { max-width: 58ch; color: var(--soft); margin: 0.75rem 0 2rem; }
+
+      .poster { text-align: center; padding-top: clamp(3.5rem, 8vw, 6rem); padding-bottom: clamp(3.5rem, 8vw, 6rem); border-bottom: 6px double var(--rule); background:
+        radial-gradient(circle at 50% 0%, rgba(169, 130, 47, 0.12), transparent 60%), var(--bone); }
+      .since { margin: 0 0 1rem; font-style: italic; color: var(--soft); }
+      .since::before, .since::after { content: '★'; color: var(--brass); margin: 0 0.75rem; font-style: normal; }
+      .poster h1 { font-size: clamp(3rem, 11vw, 8rem); color: var(--oxblood); line-height: 0.95; max-width: 12ch; margin: 0 auto; text-shadow: 3px 3px 0 rgba(169, 130, 47, 0.35); }
+      .ribbon { display: inline-block; margin: 1.5rem 0 0; padding: 0.5rem 2.25rem; background: var(--denim); color: var(--bone); font-weight: 600; font-size: clamp(1rem, 2vw, 1.2rem); clip-path: polygon(0 0, 100% 0, 96% 50%, 100% 100%, 0 100%, 4% 50%); }
+      .poster-lede { max-width: 52ch; margin: 1.75rem auto 2rem; font-size: 1.15rem; }
+      .poster-actions { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; }
+
+      .btn { display: inline-block; padding: 0.8rem 1.4rem; font: 600 1rem/1 var(--serif); text-decoration: none; border-radius: 3px; cursor: pointer; border: 2px solid var(--oxblood); }
+      .btn-red { background: var(--oxblood); color: var(--bone); }
+      .btn-red:hover { background: #64190f; }
+      .btn-plain { background: transparent; color: var(--oxblood); }
+      .btn-plain:hover:not(:disabled) { background: var(--oxblood); color: var(--bone); }
+      .btn:disabled { opacity: 0.55; cursor: default; }
+
+      .counter { max-width: 76rem; margin: 0 auto; }
+      .tags { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
+      .tag { position: relative; background: #fbf8f2; padding: 2.75rem 1.5rem 1.5rem; border: 1px solid var(--rule); clip-path: polygon(14% 0, 86% 0, 100% 8%, 100% 100%, 0 100%, 0 8%); }
+      .tag::before { content: ''; position: absolute; top: 0.9rem; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--bone); box-shadow: inset 0 0 0 2px var(--brass); }
+      .tag-photo { aspect-ratio: 4 / 3; margin-bottom: 1rem; background: repeating-linear-gradient(45deg, #e6dccb 0 10px, #ede5d7 10px 20px); }
+      .tag h3 { font-size: 1.3rem; }
+      .tag p { margin: 0.35rem 0 0; color: var(--soft); }
+      .tag .tag-price { font: 400 1.9rem/1 var(--wood); color: var(--oxblood); margin: 1rem 0 0.75rem; }
+
+      .license { background: var(--denim); color: var(--bone); }
+      .license .sec-lede { color: #c7cdd1; }
+      .license-inner { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); max-width: 76rem; margin: 0 auto; align-items: start; }
+      .progress { height: 10px; background: rgba(255, 255, 255, 0.15); border-radius: 5px; overflow: hidden; }
+      .progress span { display: block; height: 100%; width: 0; background: var(--brass); transition: width 0.3s ease; }
+      @media (prefers-reduced-motion: reduce) { .progress span { transition: none; } }
+      .progress-text { margin: 0.5rem 0 1.5rem; font-weight: 600; }
+      .steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+      .step { counter-increment: s; border-top: 1px solid rgba(255, 255, 255, 0.18); padding: 0.9rem 0; }
+      .step-check { display: grid; grid-template-columns: 2.4rem 1.4rem 1fr; align-items: center; gap: 0.6rem; cursor: pointer; }
+      .step-check::before { content: counter(s); font: 400 1.6rem/1 var(--wood); color: var(--brass); grid-column: 1; grid-row: 1; }
+      .step-check input { grid-column: 2; grid-row: 1; width: 1.3rem; height: 1.3rem; accent-color: var(--brass); }
+      .step-title { grid-column: 3; grid-row: 1; font-weight: 600; font-size: 1.1rem; }
+      .is-done .step-title { text-decoration: line-through; text-decoration-color: var(--brass); opacity: 0.75; }
+      .step details { margin-left: 4.4rem; }
+      .step summary { cursor: pointer; color: #e3c98f; font-size: 0.95rem; }
+      .step details p { margin: 0.4rem 0 0; color: #d7dcdf; }
+      .disclaimer { font-size: 0.88rem; color: #aab3ba; font-style: italic; margin-top: 1.5rem; }
+
+      .session { position: sticky; top: 1.5rem; display: grid; gap: 0.8rem; background: var(--bone); color: var(--ink); padding: 1.75rem; border-radius: 4px; border-top: 6px solid var(--brass); }
+      .session h3 { font: 400 1.6rem/1.15 var(--wood); color: var(--oxblood); }
+      .session p { margin: 0; color: var(--soft); }
+      .session label { display: grid; gap: 0.25rem; font-weight: 600; font-size: 0.95rem; }
+      .session input, .session select { font: inherit; font-weight: 400; padding: 0.55rem 0.7rem; border: 1px solid var(--rule); background: #fff; border-radius: 3px; }
+      .done { margin: 0.5rem 0 0; padding: 0.75rem 1rem; background: #e8efe0; color: #2f4a22; border-left: 3px solid #5b7f45; }
+      .license .done { background: #e8efe0; }
+
+      .gunsmith { max-width: 76rem; margin: 0 auto; }
+      .boards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.5rem; }
+      .board { background: var(--ink); color: var(--bone); padding: 1.75rem 2rem; border: 6px solid #4a3627; box-shadow: inset 0 0 0 1px #6b513c; }
+      .board h3 { font: 400 1.5rem/1.2 var(--wood); color: #e3c98f; margin-bottom: 1rem; }
+      .board ul { list-style: none; margin: 0; padding: 0; }
+      .board li { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.45rem 0; }
+      .dots { flex: 1; border-bottom: 2px dotted #7e6650; transform: translateY(-4px); }
+      .cost { font-weight: 700; color: #e3c98f; }
+
+      .seminars { max-width: 76rem; margin: 0 auto; padding-top: 0; }
+      .sem-list { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
+      .sem-list li { display: grid; grid-template-columns: 1fr auto auto; gap: 1.5rem; align-items: center; padding: 1.1rem 0; border-bottom: 1px solid var(--rule); }
+      .sem-list p { margin: 0; }
+      .sem-date { font-weight: 700; font-size: 1.15rem; }
+      .sem-time { color: var(--soft); }
+      .seats { font-weight: 600; color: var(--denim); }
+      .seats.few { color: var(--oxblood); }
+
+      .story { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; max-width: 76rem; margin: 0 auto; }
+      .portrait { aspect-ratio: 4 / 5; background: linear-gradient(160deg, #cbb89b, #8e7558); filter: sepia(0.3); border: 10px solid #fbf8f2; box-shadow: 0 0 0 1px var(--rule); }
+      .story p { max-width: 56ch; }
+      .sign { font-style: italic; color: var(--soft); }
+
+      .visit { background: var(--oxblood); color: var(--bone); text-align: center; }
+      .visit-grid { display: flex; justify-content: center; gap: clamp(1.5rem, 5vw, 4rem); flex-wrap: wrap; margin-top: 1.5rem; }
+      .visit address, .visit p { font-style: normal; margin: 0; font-size: 1.1rem; }
+      .visit a { color: #f2d9a0; }
+
+      .foot { padding: 1.5rem clamp(1rem, 4vw, 3rem) 4.5rem; background: var(--ink); color: #b8aa98; font-size: 0.9rem; text-align: center; }
+      .foot p { margin: 0; }
+
+      @media (max-width: 900px) {
+        .tags, .boards, .license-inner, .story { grid-template-columns: 1fr; }
+        .session { position: static; }
+        nav { display: none; }
+      }
+      @media (max-width: 560px) {
+        .sem-list li { grid-template-columns: 1fr; gap: 0.5rem; }
+        .board { padding: 1.25rem; }
+      }
+    </style>
+  </body>
+</html>
